@@ -45,8 +45,8 @@ El proyecto está organizado en las siguientes capas:
 - **C#**
 - **HTML / CSS**
 - **JavaScript**
-- **Bootstrap** (si aplica)
-- **SQL Server** (o el motor de base de datos correspondiente)
+- **Bootstrap**
+- **SQL Server** 
 - **Visual Studio**
 - **Git & GitHub**
 
