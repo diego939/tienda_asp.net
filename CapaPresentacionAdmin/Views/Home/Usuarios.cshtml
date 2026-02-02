@@ -1,0 +1,220 @@
+﻿
+@{
+    ViewData["Title"] = "Usuarios";
+}
+
+<ol class="breadcrumb mb-4 mt-4">
+    <li class="breadcrumb-item"><a href="index.html">Resumen</a></li>
+    <li class="breadcrumb-item active">Usuarios</li>
+</ol>
+
+<div class="card">
+    <div class="card-header"><i class="fas fa-users me-1"></i>Lista de usuarios</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <button class="btn btn-success" onclick="abrirModal(null)"><i class="bi bi-person-plus-fill"></i> Nuevo usuario</button>
+                <hr />
+                <table id="tablaUsuarios" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Nombres</th>
+                            <th>Apellidos</th>
+                            <th>Correo</th>
+                            <th>Activo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                       
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal" id="modalCrearUsuario" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Usuario</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form action="">
+                    <input type="hidden" name="id" id="txtid" value="0" />
+                    <div class="mb-3 mt-3">
+                        <label for="txtnombres" class="form-label">Nombres:</label>
+                        <input type="text" class="form-control" id="txtnombres" placeholder="Ingrese nombres" name="nombres">
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <label for="txtapellidos" class="form-label">Apellidos:</label>
+                        <input type="text" class="form-control" id="txtapellidos" placeholder="Ingrese apellidos" name="apellidos">
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <label for="txtcorreo" class="form-label">Correo:</label>
+                        <input type="email" class="form-control" id="txtcorreo" placeholder="Ingrese correo" name="correo">
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <label for="cboactivo" class="form-label">Activo:</label>
+                        <select class="form-select" id="cboactivo">
+                            <option value="" selected disabled>Seleccione un estado</option>
+                            <option value="1">Si</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                    <div class="row m-1">
+                        <div id="mensajeError" class="alert alert-danger">
+                            
+                        </div>
+                    </div>
+                    <hr/>
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-danger mx-2" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary mx-2" onclick="guardar()">Guardar</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        let filaSeleccionada;
+        let tablaUsuarios;
+        $(document).ready(function () {
+            $.ajax({
+                url: '@Url.Action("ListarUsuarios", "Home")',
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (error) {
+                    console.error("Error:", error);
+                }
+            });
+        });
+
+        tablaUsuarios = new DataTable('#tablaUsuarios', {
+            responsive:true,
+            ordering:false,
+             ajax: {
+                 url: '@Url.Action("ListarUsuarios", "Home")',
+                 type: "GET",
+                 dataType: "json",
+             },
+             columns: [
+                 { data: 'nombres' },
+                 { data: 'apellidos' },
+                 { data: 'correo' },
+                 {
+                     data: 'activo',
+                     render: function (data) {
+                         return data
+                             ? '<span class="badge bg-success">Sí</span>'
+                             : '<span class="badge bg-danger">No</span>';
+                     }
+                 },
+                 {
+                     defaultContent:
+                     `<button class="btn btn-primary ms-2 btn-editar"><i class="fas fa-pen"></i></button>`+
+                     `<button class="btn btn-danger ms-2"><i class="fas fa-trash"></i></button>`,
+                     orderable: false,
+                     searchable: false
+                 }
+             ],
+             language:{
+                 url: "https://cdn.datatables.net/plug-ins/2.3.6/i18n/es-ES.json"
+             }
+         });
+
+             function abrirModal(datos) {
+                $("#mensajeError").hide();
+            if (datos) {
+                $("#txtid").val(datos.id);
+                $("#txtnombres").val(datos.nombres);
+                $("#txtapellidos").val(datos.apellidos);
+                $("#txtcorreo").val(datos.correo);
+                $("#cboactivo").val(datos.activo ? 1 : 0);
+                
+            } else {
+                $("#txtid").val(0);
+                $("#txtnombres").val("");
+                $("#txtapellidos").val("");
+                $("#txtcorreo").val("");
+                $("#cboactivo").val("");
+            }
+
+            const modal = new bootstrap.Modal(
+                document.getElementById("modalCrearUsuario")
+            );
+            modal.show();
+        }
+
+         $("#tablaUsuarios tbody").on("click",".btn-editar", function(){
+             filaSeleccionada = $(this).closest("tr");
+             let info = tablaUsuarios.row(filaSeleccionada).data();
+             abrirModal(info)
+         })
+
+         function guardar(){
+             let usuario = {
+                id: $("#txtid").val(),
+                nombres: $("#txtnombres").val(),
+                apellidos: $("#txtapellidos").val(),
+                correo: $("#txtcorreo").val(),
+                activo: $("#cboactivo").val() == 1 ? true : false
+             }
+
+             $.ajax({
+                url: '@Url.Action("GuardarUsuario", "Home")',
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify(usuario),
+				contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    //debugger;
+                    if(usuario.id == 0){
+                        //usuario nuevo
+						if(data.resultado != 0){
+							usuario.id = data.resultado;
+                            tablaUsuarios.row.add(usuario).draw(false);
+                            $("#modalCrearUsuario").modal("hide");
+                        }else{
+                            $("#mensajeError").show()
+                            .html("<strong>Error!</strong> " + data.mensaje);
+                        }
+
+                     }else{
+                         //usuario editado
+                         if(data.resultado){
+                             tablaUsuarios.row(filaSeleccionada).data(usuario);
+                             filaSeleccionada = null;
+                             $("#modalCrearUsuario").modal("hide");
+                        }else{
+                            $("#mensajeError").show()
+                            .html("<strong>Error!</strong> " + data.mensaje);
+                        }
+                     }
+                },
+                error: function (error) {
+                    console.error("Error:", error);
+                },
+                beforeSend: function(){
+                    console.log("Enviando datos...");
+				}
+			 });
+
+
+         }
+    </script>
+}
