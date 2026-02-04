@@ -183,34 +183,49 @@
 				contentType: "application/json; charset=utf-8",
                 success: function (data) {
                     //debugger;
+                    $(".modal-body").LoadingOverlay("hide");
                     if(usuario.id == 0){
-                        //usuario nuevo
+                        //--------USUARIO NUEVO----------------
 						if(data.resultado != 0){
 							usuario.id = data.resultado;
                             tablaUsuarios.row.add(usuario).draw(false);
                             $("#modalCrearUsuario").modal("hide");
                         }else{
+                            //se muestra el error dentro del formulario
                             $("#mensajeError").show()
                             .html("<strong>Error!</strong> " + data.mensaje);
                         }
 
                      }else{
-                         //usuario editado
+                         //--------USUARIO EDITADO----------------
                          if(data.resultado){
                              tablaUsuarios.row(filaSeleccionada).data(usuario);
                              filaSeleccionada = null;
                              $("#modalCrearUsuario").modal("hide");
                         }else{
+                            //se muestra el error dentro del formulario
                             $("#mensajeError").show()
                             .html("<strong>Error!</strong> " + data.mensaje);
                         }
                      }
                 },
                 error: function (error) {
+                    //se oculta el loading cuando hay un error
+                    $(".modal-body").LoadingOverlay("hide");
+                    //se muestra el error dentro del formulario
+                    $("#mensajeError").show()
+                    .html("<strong>Error!</strong> " + data.mensaje);
+
                     console.error("Error:", error);
                 },
                 beforeSend: function(){
-                    console.log("Enviando datos...");
+                    //mientras se està ejecutando la operación aparece el loader
+                    $(".modal-body").LoadingOverlay(
+                        "show",{
+                            text: 'cargando...',
+                            size:14
+                        }
+                    )
 				}
 			 });
 
