@@ -191,6 +191,12 @@
 							usuario.id = data.resultado;
                             tablaUsuarios.row.add(usuario).draw(false);
                             $("#modalCrearUsuario").modal("hide");
+
+                            Swal.fire({
+                                icon: "success",
+                                title: "Creado",
+                                text: "usuario creado con éxito, revise super casilla de correo!"
+                            });
                         }else{
                             //se muestra el error dentro del formulario
                             $("#mensajeError").show()
@@ -203,6 +209,11 @@
                              tablaUsuarios.row(filaSeleccionada).data(usuario);
                              filaSeleccionada = null;
                              $("#modalCrearUsuario").modal("hide");
+                             Swal.fire({
+                                icon: "success",
+                                title: "Editado",
+                                text: "usuario editado con éxito!"
+                            });
                         }else{
                             //se muestra el error dentro del formulario
                             $("#mensajeError").show()

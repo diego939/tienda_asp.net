@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using System.IO;
+using System.Net;
+using System.Net.Mail;
 
 namespace CapaNegocio
 {
@@ -23,5 +26,41 @@ namespace CapaNegocio
                 return sb.ToString();
             }
         }
-    }
+
+        public static string GenerarClave()
+        {
+            string clave = Guid.NewGuid().ToString("N").Substring(0, 6);
+            return clave;
+		}
+
+        public static bool EnviarCorreo(string correo, string asunto, string mensaje)
+        {
+            bool resultado = false;
+            try
+            {
+                MailMessage mail = new MailMessage();
+                mail.To.Add(correo);
+                mail.From = new MailAddress("diegodavidalmiron1990@gmail.com");
+                mail.Subject = asunto;
+                mail.Body = mensaje;
+                mail.IsBodyHtml = true;
+
+                var smtp = new SmtpClient()
+                {
+                    Credentials = new NetworkCredential("diegodavidalmiron1990@gmail.com", "hvacazvhenwiqtqd"),
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    EnableSsl = true
+                };
+                smtp.Send(mail);
+                resultado = true;
+
+			}
+            catch (Exception)
+            {
+                resultado = false;
+            }
+            return resultado;
+		}
+	}
 }
