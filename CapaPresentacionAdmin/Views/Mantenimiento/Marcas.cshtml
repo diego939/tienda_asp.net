@@ -1,7 +1,210 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Marcas";
 }
 
-<h1>Marcas</h1>
+<ol class="breadcrumb mb-4 mt-4">
+    <li class="breadcrumb-item"><a href="marcas">Mantenimiento</a></li>
+    <li class="breadcrumb-item active">Marcas</li>
+</ol>
+
+<div class="card">
+    <div class="card-header"><i class="bi-bookmark-dash me-1"></i>Lista de marcas</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <button class="btn btn-success" onclick="abrirModal(null)">
+                    <i class="bi bi-plus-circle"></i> Nueva marca
+                </button>
+                <hr />
+                <table id="tablaMarcas" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Activo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="modalCrearMarca" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h4 class="modal-title">Marca</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="txtid" value="0" />
+
+                    <div class="mb-3 mt-3">
+                        <label class="form-label">Descripción:</label>
+                        <input type="text" class="form-control" id="txtdescripcion"
+                               placeholder="Ingrese la descripción">
+                    </div>
+
+                    <div class="mb-3 mt-3">
+                        <label class="form-label">Activo:</label>
+                        <select class="form-select" id="cboactivo">
+                            <option value="" selected disabled>Seleccione un estado</option>
+                            <option value="1">Sí</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+
+                    <div class="row m-1">
+                        <div id="mensajeError" class="alert alert-danger"></div>
+                    </div>
+
+                    <hr />
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-danger mx-2" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary mx-2" onclick="guardar()">Guardar</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        let filaSeleccionada;
+        let tablaMarcas;
+
+        tablaMarcas = new DataTable('#tablaMarcas', {
+            responsive: true,
+            ordering: false,
+            ajax: {
+                url: '@Url.Action("ListarMarcas", "Mantenimiento")',
+                type: "GET",
+                dataType: "json",
+            },
+            columns: [
+                { data: 'descripcion' },
+                {
+                    data: 'activo',
+                    render: function (data) {
+                        return data
+                            ? '<span class="badge bg-success">Sí</span>'
+                            : '<span class="badge bg-danger">No</span>';
+                    }
+                },
+                {
+                    defaultContent:
+                        `<button class="btn btn-primary ms-2 btn-editar"><i class="fas fa-pen"></i></button>` +
+                        `<button class="btn btn-danger ms-2 btn-eliminar"><i class="fas fa-trash"></i></button>`,
+                    orderable: false,
+                    searchable: false
+                }
+            ],
+            language: {
+                url: "https://cdn.datatables.net/plug-ins/2.3.6/i18n/es-ES.json"
+            }
+        });
+
+        function abrirModal(datos) {
+            $("#mensajeError").hide();
+
+            if (datos) {
+                $("#txtid").val(datos.id);
+                $("#txtdescripcion").val(datos.descripcion);
+                $("#cboactivo").val(datos.activo ? 1 : 0);
+            } else {
+                $("#txtid").val(0);
+                $("#txtdescripcion").val("");
+                $("#cboactivo").val("");
+            }
+
+            new bootstrap.Modal(document.getElementById("modalCrearMarca")).show();
+        }
+
+        $("#tablaMarcas tbody").on("click", ".btn-editar", function () {
+            filaSeleccionada = $(this).closest("tr");
+            let info = tablaMarcas.row(filaSeleccionada).data();
+            abrirModal(info);
+        });
+
+        function guardar() {
+            let marca = {
+                id: $("#txtid").val(),
+                descripcion: $("#txtdescripcion").val(),
+                activo: $("#cboactivo").val() == 1
+            };
+
+            $.ajax({
+                url: '@Url.Action("GuardarMarca", "Mantenimiento")',
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify(marca),
+                contentType: "application/json; charset=utf-8",
+                beforeSend: function () {
+                    $(".modal-body").LoadingOverlay("show", { text: 'Cargando...', size: 14 });
+                },
+                success: function (data) {
+                    $(".modal-body").LoadingOverlay("hide");
+
+                    if (marca.id == 0) {
+                        if (data.resultado != 0) {
+                            marca.id = data.resultado;
+                            tablaMarcas.row.add(marca).draw(false);
+                            $("#modalCrearMarca").modal("hide");
+
+                            Swal.fire("Creado", "Marca creada con éxito!", "success");
+                        } else {
+                            $("#mensajeError").show().html("<strong>Error!</strong> " + data.mensaje);
+                        }
+                    } else {
+                        if (data.resultado) {
+                            tablaMarcas.row(filaSeleccionada).data(marca).draw(false);
+                            filaSeleccionada = null;
+                            $("#modalCrearMarca").modal("hide");
+
+                            Swal.fire("Editado", "Marca editada con éxito!", "success");
+                        } else {
+                            $("#mensajeError").show().html("<strong>Error!</strong> " + data.mensaje);
+                        }
+                    }
+                }
+            });
+        }
+
+        $("#tablaMarcas tbody").on("click", ".btn-eliminar", function () {
+            let fila = $(this).closest("tr");
+            let info = tablaMarcas.row(fila).data();
+
+            Swal.fire({
+                title: "Eliminar este registro?",
+                text: "Esta acción no se puede deshacer!",
+                icon: "warning",
+                reverseButtons: true,
+                showCancelButton: true,
+                onfirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Sí, eliminar!",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("EliminarMarca", "Mantenimiento")', { id: info.id }, function (data) {
+                        if (data.resultado) {
+                            tablaMarcas.row(fila).remove().draw();
+                            Swal.fire("Eliminado", "Registro eliminado.", "success");
+                        } else {
+                            Swal.fire("Error", data.mensaje, "error");
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}
 
