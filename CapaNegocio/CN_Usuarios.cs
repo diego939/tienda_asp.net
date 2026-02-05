@@ -89,7 +89,9 @@ namespace CapaNegocio
 
 		public bool Eliminar(int id, out string mensaje)
 		{
+			
 			return objCD_Usuarios.Eliminar(id, out mensaje);
+			
 		}
 	}
 }

@@ -121,23 +121,35 @@ namespace CapaDatos
 		{
 			bool resultado = false;
 			mensaje = string.Empty;
+
 			try
 			{
 				using (SqlConnection oconexion = new SqlConnection(Conexion.GetCadenaConexion()))
 				{
-					SqlCommand cmd = new SqlCommand("delete top (1) form usuario where id = @id", oconexion);
-					cmd.Parameters.AddWithValue("@id", id);
+					SqlCommand cmd = new SqlCommand(
+						"DELETE FROM usuario WHERE id = @id",
+						oconexion
+					);
+
+					cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
 					cmd.CommandType = CommandType.Text;
+
 					oconexion.Open();
-					resultado = cmd.ExecuteNonQuery() > 0 ? true : false;
+					resultado = cmd.ExecuteNonQuery() > 0;
+
+					if (!resultado)
+					{
+						mensaje = "No se encontró el usuario para eliminar " + id;
+					}
 				}
 			}
 			catch (Exception ex)
 			{
-				resultado = false;
 				mensaje = ex.Message;
 			}
+
 			return resultado;
 		}
+
 	}
 }
