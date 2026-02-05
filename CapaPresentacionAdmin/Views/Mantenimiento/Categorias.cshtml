@@ -1,7 +1,298 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Categorias";
 }
 
-<h1>Categorias</h1>
+<ol class="breadcrumb mb-4 mt-4">
+    <li class="breadcrumb-item"><a href="categorias">Mantenimiento</a></li>
+    <li class="breadcrumb-item active">Categorias</li>
+</ol>
+
+<div class="card">
+    <div class="card-header"><i class="bi-tags me-1"></i>Lista de categorías</div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-12">
+                <button class="btn btn-success" onclick="abrirModal(null)"><i class="bi bi-person-plus-fill"></i> Nueva categoria</button>
+                <hr />
+                <table id="tablaCategorias" class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Descripción</th>
+                            <th>Activo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- The Modal -->
+<div class="modal" id="modalCrearCategoria" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">Categoria</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+                <form action="">
+                    <input type="hidden" name="id" id="txtid" value="0" />
+                    <div class="mb-3 mt-3">
+                        <label for="txtdescripcion" class="form-label">Descripción:</label>
+                        <input type="text" class="form-control" id="txtdescripcion" placeholder="Ingrese la descripción" name="nombres">
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <label for="cboactivo" class="form-label">Activo:</label>
+                        <select class="form-select" id="cboactivo">
+                            <option value="" selected disabled>Seleccione un estado</option>
+                            <option value="1">Si</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                    <div class="row m-1">
+                        <div id="mensajeError" class="alert alert-danger">
+                        </div>
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-center">
+                        <button type="button" class="btn btn-danger mx-2" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary mx-2" onclick="guardar()">Guardar</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        let filaSeleccionada;
+        let tablaCategorias;
+        $(document).ready(function () {
+            $.ajax({
+                url: '@Url.Action("ListarCategorias", "Mantenimiento")',
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
+                },
+                error: function (error) {
+                    console.error("Error:", error);
+                }
+            });
+        });
+
+        tablaCategorias = new DataTable('#tablaCategorias', {
+            responsive:true,
+            ordering:false,
+             ajax: {
+                 url: '@Url.Action("ListarCategorias", "Mantenimiento")',
+                 type: "GET",
+                 dataType: "json",
+             },
+             columns: [
+                 { data: 'descripcion' },
+                 {
+                     data: 'activo',
+                     render: function (data) {
+                         return data
+                             ? '<span class="badge bg-success">Sí</span>'
+                             : '<span class="badge bg-danger">No</span>';
+                     }
+                 },
+                 {
+                     defaultContent:
+                     `<button class="btn btn-primary ms-2 btn-editar"><i class="fas fa-pen"></i></button>`+
+                     `<button class="btn btn-danger ms-2 btn-eliminar"><i class="fas fa-trash"></i></button>`,
+                     orderable: false,
+                     searchable: false
+                 }
+             ],
+             language:{
+                 url: "https://cdn.datatables.net/plug-ins/2.3.6/i18n/es-ES.json"
+             }
+         });
+
+             function abrirModal(datos) {
+                $("#mensajeError").hide();
+            if (datos) {
+                $("#txtid").val(datos.id);
+                $("#txtdescripcion").val(datos.descripcion);
+                $("#cboactivo").val(datos.activo ? 1 : 0);
+
+            } else {
+                $("#txtid").val(0);
+                $("#txtdescripcion").val("");
+                $("#cboactivo").val("");
+            }
+
+            const modal = new bootstrap.Modal(
+                document.getElementById("modalCrearCategoria")
+            );
+            modal.show();
+        }
+
+         $("#tablaCategorias tbody").on("click",".btn-editar", function(){
+             filaSeleccionada = $(this).closest("tr");
+             let info = tablaCategorias.row(filaSeleccionada).data();
+             abrirModal(info)
+         })
+
+
+         function guardar(){
+             let usuario = {
+                id: $("#txtid").val(),
+                descripcion: $("#txtdescripcion").val(),
+                activo: $("#cboactivo").val() == 1 ? true : false
+             }
+
+             $.ajax({
+                url: '@Url.Action("GuardarCategoria", "Mantenimiento")',
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify(usuario),
+                contentType: "application/json; charset=utf-8",
+                success: function (data) {
+                    $(".modal-body").LoadingOverlay("hide");
+                    if(usuario.id == 0){
+                        //--------CATEGORÍA NUEVA----------------
+                        if(data.resultado != 0){
+                            usuario.id = data.resultado;
+                            tablaCategorias.row.add(usuario).draw(false);
+                            $("#modalCrearCategoria").modal("hide");
+
+                            Swal.fire({
+                                icon: "success",
+                                title: "Creado",
+                                text: "categoría creada con éxito!"
+                            });
+                        }else{
+                            //se muestra el error dentro del formulario
+                            $("#mensajeError").show()
+                            .html("<strong>Error!</strong> " + data.mensaje);
+                        }
+
+                     }else{
+                         //--------CATEGORÍA EDITADA----------------
+                         if(data.resultado){
+                             tablaCategorias.row(filaSeleccionada).data(usuario);
+                             filaSeleccionada = null;
+                             $("#modalCrearCategoria").modal("hide");
+                             Swal.fire({
+                                icon: "success",
+                                title: "Editado",
+                                text: "categoría editada con éxito!"
+                            });
+                        }else{
+                            //se muestra el error dentro del formulario
+                            $("#mensajeError").show()
+                            .html("<strong>Error!</strong> " + data.mensaje);
+                        }
+                     }
+                },
+                error: function (error) {
+                    //se oculta el loading cuando hay un error
+                    $(".modal-body").LoadingOverlay("hide");
+                    //se muestra el error dentro del formulario
+                    $("#mensajeError").show()
+                    .html("<strong>Error!</strong> " + data.mensaje);
+
+                    console.error("Error:", error);
+                },
+                beforeSend: function(){
+                    //mientras se està ejecutando la operación aparece el loader
+                    $(".modal-body").LoadingOverlay(
+                        "show",{
+                            text: 'cargando...',
+                            size:14
+                        }
+                    )
+                }
+             });
+
+
+         }
+
+        // Eliminar Categoria
+        $("#tablaCategorias tbody").on("click", ".btn-eliminar", function () {
+
+            let usuarioSeleccionado = $(this).closest("tr");
+            let info = tablaCategorias.row(usuarioSeleccionado).data();
+
+            Swal.fire({
+                title: "Eliminar este registro?",
+                text: "Esta acción no se puede deshacer!",
+                icon: "warning",
+                reverseButtons: true,
+                showCancelButton: true,
+                confirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                cancelButtonText: "Cancelar",
+                confirmButtonText: "Sí, eliminar!"
+            }).then((result) => {
+
+                if (result.isConfirmed) {
+
+                    $.ajax({
+                        url: '@Url.Action("EliminarCategoria", "Mantenimiento")',
+                        type: "POST",
+                        dataType: "json",
+                        data: {id: info.id},
+                        contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+                        beforeSend: function () {
+                            $.LoadingOverlay("show", {
+                                text: 'Cargando...',
+                                size: 14
+                            });
+                        },
+
+                        success: function (data) {
+                            $.LoadingOverlay("hide");
+
+                            if (data.resultado) {
+                                tablaCategorias.row(usuarioSeleccionado).remove().draw();
+
+                                Swal.fire({
+                                    icon: "success",
+                                    title: "Eliminado!",
+                                    text: "Registro eliminado."
+                                });
+
+                            } else {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "Error",
+                                    text: data.mensaje
+                                });
+                            }
+                        },
+
+                        error: function (error) {
+                            $.LoadingOverlay("hide");
+
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error",
+                                text: data.mansaje
+                            });
+
+                            console.error(error);
+                        }
+                    });
+                }
+            });
+        });
+
+
+    </script>
+}
 

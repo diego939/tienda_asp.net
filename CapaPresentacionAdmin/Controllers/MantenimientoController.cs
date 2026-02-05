@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using CapaEntidad;
+using CapaNegocio;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CapaPresentacionAdmin.Controllers
 {
@@ -16,5 +18,67 @@ namespace CapaPresentacionAdmin.Controllers
         {
             return View();
         }
+
+		[HttpGet]
+		public JsonResult ListarCategorias()
+		{
+			List<Categoria> lista = new List<Categoria>();
+			try
+			{
+				CN_Categoria objCN_Categorias = new CN_Categoria();
+				lista = objCN_Categorias.Listar();
+			}
+			catch (Exception ex)
+			{
+				ex.Message.ToString();
+			}
+			return Json(new { data = lista });
+		}
+		[HttpPost]
+		public JsonResult GuardarCategoria([FromBody] Categoria objCategoria)
+		{
+			object? resultado;
+			string mensaje = string.Empty;
+			try
+			{
+				CN_Categoria objCN_Categorias = new CN_Categoria();
+				if (objCategoria.id == 0)
+				{
+					// Nueva categoria
+					resultado = objCN_Categorias.Registrar(objCategoria, out mensaje);
+				}
+				else
+				{
+					// Editar categoria
+					resultado = objCN_Categorias.Editar(objCategoria, out mensaje);
+				}
+			}
+			catch (Exception ex)
+			{
+				resultado = null;
+				mensaje = ex.Message;
+			}
+			return Json(new { resultado = resultado, mensaje = mensaje });
+		}
+
+		[HttpPost]
+		public JsonResult EliminarCategoria(int id)
+		{
+			bool response = false;
+			string mensaje = string.Empty;
+
+
+			try
+			{
+				response = new CN_Categoria().Eliminar(id, out mensaje);
+			}
+			catch (Exception ex)
+			{
+				response = false;
+				mensaje = ex.Message;
+			}
+			return Json(new { resultado = response, mensaje = mensaje });
+
+		}
 	}
 }
