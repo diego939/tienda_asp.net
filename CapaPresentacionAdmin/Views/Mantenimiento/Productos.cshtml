@@ -1,7 +1,265 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Productos";
 }
 
-<h1>Productos</h1>
+<ol class="breadcrumb mb-4 mt-4">
+    <li class="breadcrumb-item"><a href="#">Mantenimiento</a></li>
+    <li class="breadcrumb-item active">Productos</li>
+</ol>
+
+<div class="card">
+    <div class="card-header">
+        <i class="bi bi-box-seam me-1"></i> Lista de productos
+    </div>
+    <div class="card-body">
+        <button class="btn btn-success mb-3" onclick="abrirModal(null)">
+            <i class="bi bi-plus-circle"></i> Nuevo producto
+        </button>
+
+        <table id="tablaProductos" class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Marca</th>
+                    <th>Categoría</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Activo</th>
+                    <th>Imagen</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal fade" id="modalProducto" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5 class="modal-title">Producto</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="txtid">
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Nombre</label>
+                        <input type="text" id="txtnombre" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Descripción</label>
+                        <input type="text" id="txtdescripcion" class="form-control">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Marca</label>
+                        <select id="cbomarca" class="form-select"></select>
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label>Categoría</label>
+                        <select id="cbocategoria" class="form-select"></select>
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>Precio</label>
+                        <input type="text" id="txtprecio" class="form-control">
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>Stock</label>
+                        <input type="number" id="txtstock" class="form-control">
+                    </div>
+
+                    <div class="col-md-4 mb-3">
+                        <label>Activo</label>
+                        <select id="cboactivo" class="form-select">
+                            <option value="1">Sí</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-12 mb-3">
+                        <label>Imagen</label>
+                        <input type="file" id="fileImagen" class="form-control">
+                    </div>
+
+                    <div class="col-md-12 mb-3 text-center">
+                        <img id="imgPreview"
+                             src="/imagenes/no-image.png"
+                             class="img-thumbnail"
+                             style="max-width:200px; display:none;">
+                    </div>
+
+                    <div class="col-12">
+                        <div id="mensajeError" class="alert alert-danger d-none"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button class="btn btn-primary" onclick="guardar()">Guardar</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        let tablaProductos;
+        let filaSeleccionada;
+
+        tablaProductos = new DataTable('#tablaProductos', {
+            responsive: true,
+            ordering: false,
+            ajax: {
+                url: '@Url.Action("ListarProductos", "Mantenimiento")',
+                type: 'GET',
+                dataType: 'json'
+            },
+            columns: [
+                { data: 'nombre' },
+                { data: 'oMarca.descripcion' },
+                { data: 'oCategoria.descripcion' },
+                { data: 'precio' },
+                { data: 'stock' },
+                { data: 'ruta_imagen', render: function (data) {
+                    if (data) {
+                        return `<img src="${data}"
+                                    class="img-thumbnail"
+                                    style="width:60px;height:60px;object-fit:cover">`;
+                    }
+                    return `<span class="text-muted">Sin imagen</span>`;
+                    }
+                },
+                {
+                    data: 'activo',
+                    render: d => d
+                        ? '<span class="badge bg-success">Sí</span>'
+                        : '<span class="badge bg-danger">No</span>'
+                },
+                {
+                    defaultContent:
+                        `<button class="btn btn-primary btn-editar"><i class="fas fa-pen"></i></button>
+                         <button class="btn btn-danger ms-2 btn-eliminar"><i class="fas fa-trash"></i></button>`
+                }
+            ],
+            language: {
+                url: "https://cdn.datatables.net/plug-ins/2.3.6/i18n/es-ES.json"
+            }
+        });
+
+        function cargarCombos() {
+            $.get('@Url.Action("ListarMarcas", "Mantenimiento")', r => {
+                $("#cbomarca").empty();
+                r.data.forEach(m =>
+                    $("#cbomarca").append(`<option value="${m.id}">${m.descripcion}</option>`));
+            });
+
+            $.get('@Url.Action("ListarCategorias", "Mantenimiento")', r => {
+                $("#cbocategoria").empty();
+                r.data.forEach(c =>
+                    $("#cbocategoria").append(`<option value="${c.id}">${c.descripcion}</option>`));
+            });
+        }
+
+        function abrirModal(data) {
+            $("#mensajeError").addClass("d-none");
+            cargarCombos();
+
+            if (data) {
+                $("#txtid").val(data.id);
+                $("#txtnombre").val(data.nombre);
+                $("#txtdescripcion").val(data.descripcion);
+                $("#txtprecio").val(data.precio);
+                $("#txtstock").val(data.stock);
+                $("#cboactivo").val(data.activo ? 1 : 0);
+                $("#cbomarca").val(data.oMarca.id);
+                $("#cbocategoria").val(data.oCategoria.id);
+                $("#fileImagen").val("");
+            } else {
+                $("#txtid").val(0);
+                $("input, select").val("");
+                $("#imgPreview").hide();
+            }
+            //1 Preview al EDITAR un producto
+             if (data && data.ruta_imagen) {
+                $("#imgPreview")
+                .attr("src", data.ruta_imagen)
+                .show();
+                } else {
+                    $("#imgPreview").hide();
+                }
+
+            new bootstrap.Modal("#modalProducto").show();
+        }
+
+        $("#tablaProductos tbody").on("click", ".btn-editar", function () {
+            filaSeleccionada = $(this).closest("tr");
+            abrirModal(tablaProductos.row(filaSeleccionada).data());
+        });
+
+        //2 Preview al SELECCIONAR un archivo (en vivo)
+        $("#fileImagen").on("change", function () {
+            let file = this.files[0];
+
+            if (!file) {
+                $("#imgPreview").hide();
+                return;
+            }
+
+            let reader = new FileReader();
+            reader.onload = function (e) {
+                $("#imgPreview")
+                    .attr("src", e.target.result)
+                    .show();
+            };
+            reader.readAsDataURL(file);
+        });
+
+
+        function guardar() {
+            let producto = {
+                id: parseInt($("#txtid").val()) || 0,
+                nombre: $("#txtnombre").val(),
+                descripcion: $("#txtdescripcion").val(),
+                precioTexto: $("#txtprecio").val(),
+                stock: $("#txtstock").val(),
+                activo: $("#cboactivo").val() == 1,
+                oMarca: { id: $("#cbomarca").val() },
+                oCategoria: { id: $("#cbocategoria").val() }
+            };
+
+            let formData = new FormData();
+            formData.append("objeto", JSON.stringify(producto));
+            formData.append("archivoImagen", $("#fileImagen")[0].files[0]);
+
+            $.ajax({
+                url: '@Url.Action("GuardarProducto", "Mantenimiento")',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function (r) {
+                    if (r.resultado) {
+                        tablaProductos.ajax.reload();
+                        $("#modalProducto").modal("hide");
+                        Swal.fire("OK", r.mensaje, "success");
+                    } else {
+                        $("#mensajeError").removeClass("d-none").text(r.mensaje);
+                    }
+                }
+            });
+        }
+    </script>
+}
 

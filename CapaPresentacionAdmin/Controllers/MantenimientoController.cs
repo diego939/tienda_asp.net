@@ -1,4 +1,5 @@
-﻿using CapaEntidad;
+﻿using System.Globalization;
+using CapaEntidad;
 using CapaNegocio;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,7 +7,13 @@ namespace CapaPresentacionAdmin.Controllers
 {
     public class MantenimientoController : Controller
     {
-        public IActionResult Categorias()
+		private readonly IWebHostEnvironment _env;
+
+		public MantenimientoController(IWebHostEnvironment env)
+		{
+			_env = env;
+		}
+		public IActionResult Categorias()
         {
             return View();
         }
@@ -147,6 +154,197 @@ namespace CapaPresentacionAdmin.Controllers
 
 			return Json(new { resultado = response, mensaje = mensaje });
 		}
+
+		[HttpGet]
+		public JsonResult ListarProductos()
+		{
+			List<Producto> lista = new List<Producto>();
+
+			try
+			{
+				CN_Producto objCN_Producto = new CN_Producto();
+				lista = objCN_Producto.Listar();
+			}
+			catch (Exception ex)
+			{
+				ex.Message.ToString();
+			}
+
+			return Json(new { data = lista });
+		}
+
+		[HttpPost]
+		public JsonResult GuardarProducto(string objeto, IFormFile archivoImagen)
+		{
+			bool operacionExitosa = true;
+			string mensaje = string.Empty;
+
+			try
+			{
+				// 1️ Deserializar producto
+				Producto? objProducto = Newtonsoft.Json.JsonConvert
+					.DeserializeObject<Producto>(objeto);
+
+				// 2️ Validar y convertir precio
+				if (!decimal.TryParse(
+					objProducto.precioTexto,
+					System.Globalization.NumberStyles.AllowDecimalPoint,
+					new CultureInfo("es-AR"),
+					out decimal precio))
+				{
+					return Json(new
+					{
+						resultado = false,
+						mensaje = "Precio inválido. Use formato 1234,56"
+					});
+				}
+
+				objProducto.precio = precio;
+
+				CN_Producto objCN_Producto = new CN_Producto();
+
+				// 3️ Registrar o editar producto
+				if (objProducto.id == 0)
+				{
+					int idGenerado = objCN_Producto.Registrar(objProducto, out mensaje);
+
+					if (idGenerado == 0)
+					{
+						return Json(new { resultado = false, mensaje });
+					}
+
+					objProducto.id = idGenerado;
+				}
+				else
+				{
+					operacionExitosa = objCN_Producto.Editar(objProducto, out mensaje);
+
+					if (!operacionExitosa)
+					{
+						return Json(new { resultado = false, mensaje });
+					}
+				}
+
+				// 4️ Guardar imagen si existe
+				if (archivoImagen != null && archivoImagen.Length > 0)
+				{
+					string extension = Path.GetExtension(archivoImagen.FileName).ToLower();
+					string[] extensionesPermitidas = { ".jpg", ".jpeg", ".png" };
+
+					if (!extensionesPermitidas.Contains(extension))
+					{
+						return Json(new
+						{
+							resultado = false,
+							mensaje = "Solo se permiten imágenes JPG o PNG"
+						});
+					}
+
+					string nombreImagen = $"producto_{objProducto.id}{extension}";
+
+					string carpetaImagenes = Path.Combine(
+						_env.WebRootPath,
+						"imagenes",
+						"productos"
+					);
+
+					if (!Directory.Exists(carpetaImagenes))
+						Directory.CreateDirectory(carpetaImagenes);
+
+					string rutaFisica = Path.Combine(carpetaImagenes, nombreImagen);
+
+					using (FileStream stream = new FileStream(rutaFisica, FileMode.Create))
+					{
+						archivoImagen.CopyTo(stream);
+					}
+
+					string rutaWeb = $"/imagenes/productos/{nombreImagen}";
+
+					bool imagenGuardada = objCN_Producto.GuardarImagen(new Producto
+					{
+						id = objProducto.id,
+						ruta_imagen = rutaWeb,
+						nombre_imagen = nombreImagen
+					}, out mensaje);
+
+					if (!imagenGuardada)
+					{
+						return Json(new
+						{
+							resultado = false,
+							mensaje = "Producto guardado, pero falló la imagen: " + mensaje
+						});
+					}
+
+					objProducto.ruta_imagen = rutaWeb;
+					objProducto.nombre_imagen = nombreImagen;
+
+					objCN_Producto.Editar(objProducto, out mensaje);
+				}
+
+				return Json(new
+				{
+					resultado = true,
+					mensaje = "Producto guardado correctamente"
+				});
+			}
+			catch (Exception ex)
+			{
+				return Json(new
+				{
+					resultado = false,
+					mensaje = "Error inesperado: " + ex.Message
+				});
+			}
+		}
+
+
+		[HttpPost]
+		public JsonResult EliminarProducto(int id)
+		{
+			bool response = false;
+			string mensaje = string.Empty;
+
+			try
+			{
+				response = new CN_Producto().Eliminar(id, out mensaje);
+			}
+			catch (Exception ex)
+			{
+				response = false;
+				mensaje = ex.Message;
+			}
+
+			return Json(new { resultado = response, mensaje = mensaje });
+		}
+
+		[HttpPost]
+		public JsonResult GuardarImagenProducto(int id, string ruta_imagen, string nombre_imagen)
+		{
+			bool response = false;
+			string mensaje = string.Empty;
+
+			try
+			{
+				Producto obj = new Producto()
+				{
+					id = id,
+					ruta_imagen = ruta_imagen,
+					nombre_imagen = nombre_imagen
+				};
+
+				response = new CN_Producto().GuardarImagen(obj, out mensaje);
+			}
+			catch (Exception ex)
+			{
+				response = false;
+				mensaje = ex.Message;
+			}
+
+			return Json(new { resultado = response, mensaje = mensaje });
+		}
+
+
 
 	}
 }
