@@ -95,7 +95,7 @@
                         <img id="imgPreview"
                              src="/imagenes/no-image.png"
                              class="img-thumbnail"
-                             style="max-width:200px; display:none;">
+                             style="max-height:200px; display:none;">
                     </div>
 
                     <div class="col-12">
@@ -136,7 +136,7 @@
                     if (data) {
                         return `<img src="${data}"
                                     class="img-thumbnail"
-                                    style="width:60px;height:60px;object-fit:cover">`;
+                                    style="height:40px;object-fit:cover">`;
                     }
                     return `<span class="text-muted">Sin imagen</span>`;
                     }
