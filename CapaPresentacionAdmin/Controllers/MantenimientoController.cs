@@ -344,7 +344,38 @@ namespace CapaPresentacionAdmin.Controllers
 			return Json(new { resultado = response, mensaje = mensaje });
 		}
 
+		//USAR MAS ADELANTE PARA CONVERTIR LA IMAGEN A BASE64 PARA GUARDARLA EN LA BASE DE DATOS
+		[HttpPost]
+		public JsonResult ConvertirImagenBase64(int id)
+		{
+			bool conversion = false;
 
+			Producto? oProducto = new CN_Producto()
+				.Listar()
+				.FirstOrDefault(p => p.id == id);
+
+			if (oProducto == null)
+			{
+				return Json(new
+				{
+					conversion = false,
+					textoBase64 = "",
+					extension = ""
+				});
+			}
+
+			string textoBase64 = CN_Recursos.ConvertirBase64(
+				Path.Combine(oProducto.ruta_imagen, oProducto.nombre_imagen),
+				out conversion
+			);
+
+			return Json(new
+			{
+				conversion = conversion,
+				textoBase64 = textoBase64,
+				extension = oProducto.nombre_imagen
+			});
+		}
 
 	}
 }

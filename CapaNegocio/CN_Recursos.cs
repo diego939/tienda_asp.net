@@ -31,7 +31,7 @@ namespace CapaNegocio
         {
             string clave = Guid.NewGuid().ToString("N").Substring(0, 6);
             return clave;
-		}
+        }
 
         public static bool EnviarCorreo(string correo, string asunto, string mensaje)
         {
@@ -55,12 +55,30 @@ namespace CapaNegocio
                 smtp.Send(mail);
                 resultado = true;
 
-			}
+            }
             catch (Exception)
             {
                 resultado = false;
             }
             return resultado;
-		}
-	}
+        }
+
+		//USAR MAS ADELANTE PARA CONVERTIR LA IMAGEN A BASE64 PARA GUARDARLA EN LA BASE DE DATOS
+		public static string ConvertirBase64(string texto, out bool conversion)
+        {
+            string resultadoBase64 = string.Empty;
+            conversion = true;
+            try
+            {
+                byte[] textoBytes = Encoding.UTF8.GetBytes(texto);
+                resultadoBase64 = Convert.ToBase64String(textoBytes);
+
+            }
+            catch (Exception)
+            {
+                conversion = false;
+            }
+            return resultadoBase64;
+        }
+    }
 }

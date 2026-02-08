@@ -70,12 +70,12 @@
 
                     <div class="col-md-4 mb-3">
                         <label>Precio</label>
-                        <input type="text" id="txtprecio" class="form-control">
+                        <input type="text" id="txtprecio" class="form-control" value="0,00">
                     </div>
 
                     <div class="col-md-4 mb-3">
                         <label>Stock</label>
-                        <input type="number" id="txtstock" class="form-control">
+                        <input type="number" id="txtstock" class="form-control" min="0">
                     </div>
 
                     <div class="col-md-4 mb-3">
@@ -95,7 +95,8 @@
                         <img id="imgPreview"
                              src="/imagenes/no-image.png"
                              class="img-thumbnail"
-                             style="max-height:200px; display:none;">
+                             style="max-height:400px; display:none;"
+                             accept="image/png, image/jpg">
                     </div>
 
                     <div class="col-12">
@@ -130,7 +131,14 @@
                 { data: 'nombre' },
                 { data: 'oMarca.descripcion' },
                 { data: 'oCategoria.descripcion' },
-                { data: 'precio' },
+                { data: 'precio',
+                render: function (data) {
+                    return new Intl.NumberFormat('es-AR', {
+                        style: 'currency',
+                        currency: 'ARS'
+                    }).format(data);
+                    }
+                },
                 { data: 'stock' },
                 { data: 'ruta_imagen', render: function (data) {
                     if (data) {
@@ -225,7 +233,6 @@
             };
             reader.readAsDataURL(file);
         });
-
 
         function guardar() {
             let producto = {
