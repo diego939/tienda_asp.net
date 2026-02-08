@@ -260,6 +260,34 @@
                 }
             });
         }
+
+         $("#tablaProductos tbody").on("click", ".btn-eliminar", function () {
+            let fila = $(this).closest("tr");
+            let info = tablaProductos.row(fila).data();
+
+            Swal.fire({
+                title: "Eliminar este registro?",
+                text: "Esta acción no se puede deshacer!",
+                icon: "warning",
+                reverseButtons: true,
+                showCancelButton: true,
+                onfirmButtonColor: "#3085d6",
+                cancelButtonColor: "#d33",
+                confirmButtonText: "Sí, eliminar!",
+                cancelButtonText: "Cancelar"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.post('@Url.Action("EliminarProducto", "Mantenimiento")', { id: info.id }, function (data) {
+                        if (data.resultado) {
+                            tablaProductos.row(fila).remove().draw();
+                            Swal.fire("Eliminado", "Registro eliminado.", "success");
+                        } else {
+                            Swal.fire("Error", data.mensaje, "error");
+                        }
+                    });
+                }
+            });
+        });
     </script>
 }
 
