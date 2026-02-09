@@ -336,21 +336,46 @@
             formData.append("archivoImagen", $("#fileImagen")[0].files[0]);
 
             $.ajax({
-                url: '@Url.Action("GuardarProducto", "Mantenimiento")',
-                type: 'POST',
-                data: formData,
-                contentType: false,
-                processData: false,
-                success: function (r) {
-                    if (r.resultado) {
-                        tablaProductos.ajax.reload();
-                        $("#modalProducto").modal("hide");
-                        Swal.fire("OK", r.mensaje, "success");
-                    } else {
-                        mostrarError(r.mensaje);
-                    }
+            url: '@Url.Action("GuardarProducto", "Mantenimiento")',
+            type: 'POST',
+            data: formData,
+            contentType: false,
+            processData: false,
+
+            beforeSend: function () {
+                // 🔵 mostrar overlay
+                $("#modalProducto .modal-body").LoadingOverlay("show", {
+                    text: "Guardando...",
+                    size: 14
+                });
+            },
+
+            success: function (r) {
+                // 🔵 ocultar overlay cuando la respuesta es positiva
+                $("#modalProducto .modal-body").LoadingOverlay("hide");
+
+                if (r.resultado) {
+                    tablaProductos.ajax.reload(null, false);
+                    $("#modalProducto").modal("hide");
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "OK",
+                        text: r.mensaje
+                    });
+                } else {
+                    mostrarError(r.mensaje);
                 }
-            });
+            },
+
+            error: function (error) {
+                // 🔵 ocultar overlay cuando da un error
+                $("#modalProducto .modal-body").LoadingOverlay("hide");
+
+                mostrarError("Ocurrió un error inesperado al guardar el producto");
+                console.error(error);
+            }
+        });
         }
 
         function mostrarError(mensaje) {
@@ -370,7 +395,7 @@
                 icon: "warning",
                 reverseButtons: true,
                 showCancelButton: true,
-                onfirmButtonColor: "#3085d6",
+                confirmButtonColor: "#3085d6",
                 cancelButtonColor: "#d33",
                 confirmButtonText: "Sí, eliminar!",
                 cancelButtonText: "Cancelar"
