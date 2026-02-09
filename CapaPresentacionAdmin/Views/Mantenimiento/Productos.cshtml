@@ -50,37 +50,46 @@
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label>Nombre</label>
-                        <input type="text" id="txtnombre" class="form-control">
+                        <input type="text" id="txtnombre" class="form-control"
+                               placeholder="Ingrese el nombre del producto">
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label>Descripción</label>
-                        <input type="text" id="txtdescripcion" class="form-control">
+                        <input type="text" id="txtdescripcion" class="form-control"
+                               placeholder="Ingrese una descripción">
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label>Marca</label>
-                        <select id="cbomarca" class="form-select"></select>
+                        <select id="cbomarca" class="form-select">
+                            <option value="" selected disabled>Seleccione una marca</option>
+                        </select>
                     </div>
 
                     <div class="col-md-6 mb-3">
                         <label>Categoría</label>
-                        <select id="cbocategoria" class="form-select"></select>
+                        <select id="cbocategoria" class="form-select">
+                            <option value="" selected disabled>Seleccione una categoría</option>
+                        </select>
                     </div>
 
                     <div class="col-md-4 mb-3">
                         <label>Precio</label>
-                        <input type="text" id="txtprecio" class="form-control" value="0,00">
+                        <input type="text" id="txtprecio" class="form-control"
+                               placeholder="0,00">
                     </div>
 
                     <div class="col-md-4 mb-3">
                         <label>Stock</label>
-                        <input type="number" id="txtstock" class="form-control" min="0">
+                        <input type="number" id="txtstock" class="form-control"
+                               min="0" placeholder="Cantidad disponible">
                     </div>
 
                     <div class="col-md-4 mb-3">
                         <label>Activo</label>
                         <select id="cboactivo" class="form-select">
+                            <option value="" selected disabled>Seleccione estado</option>
                             <option value="1">Sí</option>
                             <option value="0">No</option>
                         </select>
@@ -88,7 +97,8 @@
 
                     <div class="col-md-12 mb-3">
                         <label>Imagen</label>
-                        <input type="file" id="fileImagen" class="form-control" accept="image/png, image/jpeg, image/jpg">
+                        <input type="file" id="fileImagen" class="form-control"
+                               accept="image/png, image/jpeg, image/jpg">
                     </div>
 
                     <div class="col-md-12 mb-3 text-center">
@@ -112,6 +122,7 @@
         </div>
     </div>
 </div>
+
 
 @section scripts {
     <script>
