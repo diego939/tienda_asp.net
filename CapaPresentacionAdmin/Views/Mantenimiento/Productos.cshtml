@@ -88,15 +88,14 @@
 
                     <div class="col-md-12 mb-3">
                         <label>Imagen</label>
-                        <input type="file" id="fileImagen" class="form-control">
+                        <input type="file" id="fileImagen" class="form-control" accept="image/png, image/jpeg, image/jpg">
                     </div>
 
                     <div class="col-md-12 mb-3 text-center">
                         <img id="imgPreview"
                              src="/imagenes/no-image.png"
                              class="img-thumbnail"
-                             style="max-height:400px; display:none;"
-                             accept="image/png, image/jpg">
+                             style="max-height:400px; display:none;">
                     </div>
 
                     <div class="col-12">
@@ -166,23 +165,55 @@
             }
         });
 
-        function cargarCombos() {
+        function cargarCombos(producto = null) {
+
             $.get('@Url.Action("ListarMarcas", "Mantenimiento")', r => {
-                $("#cbomarca").empty();
-                r.data.forEach(m =>
-                    $("#cbomarca").append(`<option value="${m.id}">${m.descripcion}</option>`));
+                const cboMarca = $("#cbomarca");
+                cboMarca.empty();
+
+                cboMarca.append(
+                    `<option value="" disabled selected>Seleccione una marca</option>`
+                );
+
+                r.data.forEach(m => {
+                    cboMarca.append(
+                        `<option value="${m.id}">${m.descripcion}</option>`
+                    );
+                });
+
+                // 👉 seleccionar marca SOLO cuando ya cargó
+                if (producto) {
+                    cboMarca.val(producto.oMarca.id);
+                }
             });
 
             $.get('@Url.Action("ListarCategorias", "Mantenimiento")', r => {
-                $("#cbocategoria").empty();
-                r.data.forEach(c =>
-                    $("#cbocategoria").append(`<option value="${c.id}">${c.descripcion}</option>`));
+                const cboCategoria = $("#cbocategoria");
+                cboCategoria.empty();
+
+                cboCategoria.append(
+                    `<option value="" disabled selected>Seleccione una categoría</option>`
+                );
+
+                r.data.forEach(c => {
+                    cboCategoria.append(
+                        `<option value="${c.id}">${c.descripcion}</option>`
+                    );
+                });
+
+                // 👉 seleccionar categoría SOLO cuando ya cargó
+                if (producto) {
+                    cboCategoria.val(producto.oCategoria.id);
+                }
             });
         }
 
+
+
         function abrirModal(data) {
             $("#mensajeError").addClass("d-none");
-            cargarCombos();
+
+            cargarCombos(data);
 
             if (data) {
                 $("#txtid").val(data.id);
@@ -191,25 +222,24 @@
                 $("#txtprecio").val(data.precio);
                 $("#txtstock").val(data.stock);
                 $("#cboactivo").val(data.activo ? 1 : 0);
-                $("#cbomarca").val(data.oMarca.id);
-                $("#cbocategoria").val(data.oCategoria.id);
                 $("#fileImagen").val("");
             } else {
                 $("#txtid").val(0);
                 $("input, select").val("");
                 $("#imgPreview").hide();
             }
-            //1 Preview al EDITAR un producto
-             if (data && data.ruta_imagen) {
+
+            if (data && data.ruta_imagen) {
                 $("#imgPreview")
-                .attr("src", data.ruta_imagen)
-                .show();
-                } else {
-                    $("#imgPreview").hide();
-                }
+                    .attr("src", data.ruta_imagen)
+                    .show();
+            } else {
+                $("#imgPreview").hide();
+            }
 
             new bootstrap.Modal("#modalProducto").show();
         }
+
 
         $("#tablaProductos tbody").on("click", ".btn-editar", function () {
             filaSeleccionada = $(this).closest("tr");
@@ -235,15 +265,59 @@
         });
 
         function guardar() {
+
+            // limpiar mensaje previo
+            $("#mensajeError").addClass("d-none").text("");
+
+            // capturar valores
+            const nombre = $("#txtnombre").val().trim();
+            const descripcion = $("#txtdescripcion").val().trim();
+            const precioTexto = $("#txtprecio").val().trim();
+            const stock = $("#txtstock").val();
+            const idMarca = $("#cbomarca").val();
+            const idCategoria = $("#cbocategoria").val();
+
+            // VALIDACIONES
+            if (!nombre) {
+                mostrarError("El nombre del producto es obligatorio");
+                return;
+            }
+
+            if (!descripcion) {
+                mostrarError("La descripción del producto es obligatoria");
+                return;
+            }
+
+            if (!idMarca) {
+                mostrarError("Debe seleccionar una marca");
+                return;
+            }
+
+            if (!idCategoria) {
+                mostrarError("Debe seleccionar una categoría");
+                return;
+            }
+
+            if (!precioTexto || isNaN(precioTexto.replace(",", "."))) {
+                mostrarError("Debe ingresar un precio válido");
+                return;
+            }
+
+            if (stock === "" || isNaN(stock) || parseInt(stock) < 0) {
+                mostrarError("El stock debe ser un número mayor o igual a 0");
+                return;
+            }
+
+            // ARMAR OBJETO (ya validado)
             let producto = {
                 id: parseInt($("#txtid").val()) || 0,
-                nombre: $("#txtnombre").val(),
-                descripcion: $("#txtdescripcion").val(),
-                precioTexto: $("#txtprecio").val(),
-                stock: $("#txtstock").val(),
+                nombre: nombre,
+                descripcion: descripcion,
+                precioTexto: precioTexto,
+                stock: parseInt(stock),
                 activo: $("#cboactivo").val() == 1,
-                oMarca: { id: $("#cbomarca").val() },
-                oCategoria: { id: $("#cbocategoria").val() }
+                oMarca: { id: parseInt(idMarca) },
+                oCategoria: { id: parseInt(idCategoria) }
             };
 
             let formData = new FormData();
@@ -262,11 +336,18 @@
                         $("#modalProducto").modal("hide");
                         Swal.fire("OK", r.mensaje, "success");
                     } else {
-                        $("#mensajeError").removeClass("d-none").text(r.mensaje);
+                        mostrarError(r.mensaje);
                     }
                 }
             });
         }
+
+        function mostrarError(mensaje) {
+            $("#mensajeError")
+                .removeClass("d-none")
+                .text(mensaje);
+        }
+
 
          $("#tablaProductos tbody").on("click", ".btn-eliminar", function () {
             let fila = $(this).closest("tr");
