@@ -83,7 +83,7 @@
                     <div class="col-md-4 mb-3">
                         <label>Stock</label>
                         <input type="number" id="txtstock" class="form-control"
-                               min="0" placeholder="Cantidad disponible">
+                               min="0" step="1" value="0" placeholder="Cantidad disponible">
                     </div>
 
                     <div class="col-md-4 mb-3">
@@ -220,7 +220,6 @@
         }
 
 
-
         function abrirModal(data) {
             $("#mensajeError").addClass("d-none");
 
@@ -275,6 +274,42 @@
             reader.readAsDataURL(file);
         });
 
+        // Restricción en tiempo real para #txtprecio 
+        $("#txtprecio").on("input", function () {
+            let valor = this.value;
+
+            // quitar todo lo que no sea número, punto o coma
+            valor = valor.replace(/[^0-9.,]/g, "");
+
+            // permitir solo un separador decimal
+            const partes = valor.split(/[,\.]/);
+            if (partes.length > 2) {
+                valor = partes[0] + "." + partes.slice(1).join("");
+            }
+
+            // limitar a 2 decimales
+            if (partes.length === 2) {
+                valor = partes[0] + "." + partes[1].substring(0, 2);
+            }
+
+            this.value = valor;
+        });
+
+        // Restricción en tiempo real para #txtstock
+        $("#txtstock").on("input", function () {
+            let valor = this.value;
+
+            // quitar todo lo que no sea número
+            valor = valor.replace(/\D/g, "");
+
+            // si queda vacío, volver a 0
+            if (valor === "") {
+                valor = "0";
+            }
+
+            this.value = valor;
+        });
+
         function guardar() {
 
             // limpiar mensaje previo
@@ -309,11 +344,12 @@
                 return;
             }
 
+            //Esta validación solamente queda de ejemplo porque estoy usando Restricción en tiempo real para #txtprecio
             if (!precioTexto || isNaN(precioTexto.replace(",", "."))) {
                 mostrarError("Debe ingresar un precio válido");
                 return;
             }
-
+            //Esta validación solamente queda de ejemplo porque estoy usando Restricción en tiempo real para #txtstock
             if (stock === "" || isNaN(stock) || parseInt(stock) < 0) {
                 mostrarError("El stock debe ser un número mayor o igual a 0");
                 return;
