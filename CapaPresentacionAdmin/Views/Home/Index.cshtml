@@ -2,7 +2,54 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<h1 class="mt-4 bi-house">Inicio</h1>
+<ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">Inicio</li>
+</ol>
+<div class="row">
+    <div class="col-xl-4 col-md-6">
+        <div class="card bg-gradient bg-black shadow-lg text-white mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-9">
+                        <h6>Cantidad de Ventas</h6>
+                        <h6 id="totalventa">0</h6>
+                    </div>
+                    <div class="col-sm-3">
+                        <i class="fas fa-shopping-bag fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6">
+        <div class="card bg-gradient bg-dark shadow-lg text-white mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-9">
+                        <h6>Cantidad de Clientes</h6>
+                        <h6 id="totalcliente">0</h6>
+                    </div>
+                    <div class="col-sm-3">
+                        <i class="fas fa-user fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6">
+        <div class="card bg-gradient bg-secondary shadow-lg text-white mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-9">
+                        <h6>Cantidad de Productos</h6>
+                        <h6 id="totalproducto">0</h6>
+                    </div>
+                    <div class="col-sm-3">
+                        <i class="fas fa-boxes fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
