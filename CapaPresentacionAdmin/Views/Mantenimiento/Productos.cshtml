@@ -235,7 +235,12 @@
                 $("#fileImagen").val("");
             } else {
                 $("#txtid").val(0);
-                $("input, select").val("");
+
+                $("#modalProducto")
+                .find("input, select")
+                .not("#txtstock")
+                .val("");
+                $("#txtstock").val(0);
                 $("#imgPreview").hide();
             }
 
