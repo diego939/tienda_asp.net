@@ -53,3 +53,70 @@
         </div>
     </div>
 </div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-tags me-1"></i>
+        Historial de ventas
+    </div>
+    <div class="card-body">
+        <form>
+            <div class="row align-items-end">
+                <div class="col-sm-2 mb-2">
+                    <label class="form-label">Fecha Inicio:</label>
+                    <input type="text" name="fechainicio" id="txtfechainicio" value="" />
+                </div>
+                <div class="col-sm-2 mb-2">
+                    <label class="form-label">Fecha Fin:</label>
+                    <input type="text" name="fechafin" id="txtfechafin" value="" />
+                </div>
+                <div class="col-sm-2 mb-2">
+                    <label class="form-label">ID Transacción:</label>
+                    <input type="text" name="idtransaccion" id="txtidtransaccion" value="" />
+                </div>
+                <div class="col-sm-2 mb-2 d-grid">
+                    <button type="button" id="btnbuscar" class="btn btn-dark"><i class="bi bi-search"></i> Buscar</button>
+                </div>
+                <div class="col-sm-2 mb-2 d-grid">
+                    <button type="submit" id="btnbuscar" class="btn btn-success"><i class="bi bi-filetype-csv"></i> Exportar</button>
+                </div>
+            </div>
+        </form>
+        <hr style="color:#000; opacity: 0.5;">
+        <table id="tabla" class="table">
+            <thead class="table-dark">
+                <tr>
+                    <th>Fecha Venta</th>
+                    <th>Cliente</th>
+                    <th>Producto</th>
+                    <th>Precio</th>
+                    <th>Cantidad</th>
+                    <th>Total</th>
+                    <th>ID Transacción</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+         $(document).ready(function () {
+            $.ajax({
+                url: '@Url.Action("VistaDashboard", "Home")',
+                type: "GET",
+                dataType: "json",
+                success: function (data) {
+                    var objeto = data.data;
+					$("#totalventa").text(objeto.totalVenta);
+					$("#totalcliente").text(objeto.totalCliente);
+					$("#totalproducto").text(objeto.totalProducto);
+                },
+                error: function (error) {
+                    console.error("Error:", error);
+                }
+            });
+        });
+    </script>
+}

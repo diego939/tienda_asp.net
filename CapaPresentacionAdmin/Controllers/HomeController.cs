@@ -78,6 +78,14 @@ namespace CapaPresentacionAdmin.Controllers
 
 		}
 
+        [HttpGet]
+        public JsonResult VistaDashboard()
+        {
+            CN_Reporte objCN_Reporte = new CN_Reporte();
+            DashBoard dashboard = objCN_Reporte.VerDashboard();
+            return Json(new { data = dashboard });
+		}
+
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
