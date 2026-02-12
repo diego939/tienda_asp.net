@@ -131,5 +131,59 @@
                 }
             });
         });
+
+        var tablaReporte;
+
+        $(document).ready(function () {
+
+            tablaReporte = new DataTable('#tabla', {
+                responsive: true,
+                //ordering: false,
+                ajax: {
+                    url: '@Url.Action("ListaReporteVentas", "Home")',
+                    type: "GET",
+                    data: function (d) {
+
+                        d.fechainicio = $("#txtfechainicio").val();
+                        d.fechafin = $("#txtfechafin").val();
+                        d.idtransaccion = $("#txtidtransaccion").val();
+
+                    }
+                },
+                columns: [
+                    { data: 'fechaVenta' },
+                    { data: 'cliente' },
+                    { data: 'producto' },
+                    { data: 'precio',
+                        render: function (data) {
+                            return new Intl.NumberFormat('es-AR', {
+                                style: 'currency',
+                                currency: 'ARS'
+                            }).format(data);
+                            }
+                    },
+                    { data: 'cantidad' },
+                    { data: 'total',
+                        render: function(data){
+                            return new Intl.NumberFormat('es-AR',
+                            {
+                                style: 'currency',
+                                currency: 'ARS'
+                            }).format(data);
+                        }
+                    },
+                    { data: 'transaccion' }
+                ],
+                language: {
+                    url: "https://cdn.datatables.net/plug-ins/2.3.6/i18n/es-ES.json"
+                }
+            });
+
+        });
+
+        $("#btnbuscar").click(function () {
+            tablaReporte.ajax.reload();
+        })
+
     </script>
 }
