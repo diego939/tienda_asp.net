@@ -44,5 +44,45 @@ namespace CapaDatos
 
 			return objeto;
 		}
+
+		public List<Reporte> Ventas(string fechainicio, string fechafin, string idtransaccion)
+		{
+			List<Reporte> lista = new List<Reporte>();
+
+			try
+			{
+				using (SqlConnection oconexion = new SqlConnection(Conexion.GetCadenaConexion()))
+				{
+					SqlCommand cmd = new SqlCommand("sp_ReporteVentas", oconexion);
+					cmd.Parameters.AddWithValue("@fechainicio", fechainicio);
+					cmd.Parameters.AddWithValue("@fechafin", fechafin);
+					cmd.Parameters.AddWithValue("@idtransaccion", idtransaccion);
+					cmd.CommandType = CommandType.StoredProcedure;
+					oconexion.Open();
+					using (SqlDataReader dr = cmd.ExecuteReader())
+					{
+						while (dr.Read())
+						{
+							lista.Add(new Reporte()
+							{
+								fechaVenta = dr["fechaVenta"].ToString(),
+								cliente = dr["cliente"].ToString(),
+								producto = dr["producto"].ToString(),
+								precio = Convert.ToDecimal(dr["precio"]),
+								cantidad = Convert.ToInt32(dr["cantidad"]),
+								total = Convert.ToDecimal(dr["total"]),
+								transaccion = dr["transaccion"].ToString()
+							});
+						}
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Error en CD_Reporte.Ventas", ex);
+			}
+
+			return lista;
+		}
 	}
 }

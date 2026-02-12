@@ -86,6 +86,15 @@ namespace CapaPresentacionAdmin.Controllers
             return Json(new { data = dashboard });
 		}
 
+		[HttpGet]
+		public JsonResult ListaReporteVentas(string fechainicio, string fechafin, string idtransaccion)
+		{
+			List<Reporte> listaReporte = new List<Reporte>();
+            listaReporte = new CN_Reporte().Ventas(fechainicio, fechafin, idtransaccion);
+            return Json(new { data = listaReporte });
+
+		}
+
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

@@ -16,5 +16,10 @@ namespace CapaNegocio
         {
             return objCD_Reporte.VerDashboard();
 		}
+
+		public List<Reporte> Ventas(string fechainicio, string fechafin, string idtransaccion)
+        {
+            return objCD_Reporte.Ventas(fechainicio, fechafin, idtransaccion);
+		}
 	}
 }
