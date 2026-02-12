@@ -3,6 +3,8 @@ using CapaPresentacionAdmin.Models;
 using Microsoft.AspNetCore.Mvc;
 using CapaNegocio;
 using CapaEntidad;
+using System.Data;
+using ClosedXML.Excel;
 
 namespace CapaPresentacionAdmin.Controllers
 {
@@ -94,6 +96,43 @@ namespace CapaPresentacionAdmin.Controllers
             return Json(new { data = listaReporte });
 
 		}
+
+        [HttpPost]
+        public FileResult ExportarReporteVentas(string fechainicio, string fechafin, string idtransaccion)
+        {
+            List<Reporte> listaReporte = new List<Reporte>();
+            listaReporte = new CN_Reporte().Ventas(fechainicio, fechafin, idtransaccion);
+            
+            DataTable dt = new DataTable();
+
+            dt.Locale = new System.Globalization.CultureInfo("es-AR");
+
+            dt.Columns.Add("Fecha Venta", typeof(string));
+            dt.Columns.Add("Cliente", typeof(string));
+            dt.Columns.Add("Producto", typeof(string));
+            dt.Columns.Add("Precio", typeof(decimal));
+            dt.Columns.Add("Cantidad", typeof(int));
+            dt.Columns.Add("Total", typeof(decimal));
+            dt.Columns.Add("Transacción", typeof(string));
+            dt.Columns.Add("Fecha Exportación", typeof(string));
+            
+            foreach(Reporte rep in listaReporte)
+            {
+                dt.Rows.Add(new object[] { rep.fechaVenta, rep.cliente, rep.producto, rep.precio, rep.cantidad, rep.total, rep.transaccion, DateTime.Now.ToString("dd/MM/yyyy") });
+			}
+
+            dt.TableName = "ReporteVentas";
+
+            using (XLWorkbook wb = new XLWorkbook())
+            {
+                wb.Worksheets.Add(dt);
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    wb.SaveAs(stream);
+                    return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "ReporteVentas"+ DateTime.Now.ToString("dd/MM/yyyy") + ".xlsx");
+                }
+			}
+		}   
 
 		[ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

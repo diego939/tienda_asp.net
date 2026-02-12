@@ -60,7 +60,7 @@
         Historial de ventas
     </div>
     <div class="card-body">
-        <form>
+        <form action="@Url.Action("ExportarReporteVentas", "Home")" method="POST">
             <div class="row align-items-end">
                 <div class="col-sm-2 mb-2">
                     <label class="form-label">Fecha Inicio:</label>
@@ -78,7 +78,7 @@
                     <button type="button" id="btnbuscar" class="btn btn-dark form-control"><i class="bi bi-search"></i> Buscar</button>
                 </div>
                 <div class="col-sm-3 mb-2 d-grid">
-                    <button type="submit" id="btnbuscar" class="btn btn-success form-control"><i class="bi bi-filetype-csv"></i> Exportar</button>
+                    <button type="submit" id="btnbuscar" class="btn btn-success form-control"><i class="fa-solid fa-file-excel"></i> Exportar</button>
                 </div>
             </div>
         </form>
