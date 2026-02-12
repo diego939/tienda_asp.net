@@ -64,21 +64,21 @@
             <div class="row align-items-end">
                 <div class="col-sm-2 mb-2">
                     <label class="form-label">Fecha Inicio:</label>
-                    <input type="text" name="fechainicio" id="txtfechainicio" value="" />
+                    <input type="text" name="fechainicio" id="txtfechainicio" value="" class="form-control" placeholder="Seleccionar fecha Inicio" />
                 </div>
                 <div class="col-sm-2 mb-2">
                     <label class="form-label">Fecha Fin:</label>
-                    <input type="text" name="fechafin" id="txtfechafin" value="" />
+                    <input type="text" name="fechafin" id="txtfechafin" value="" class="form-control" placeholder="Seleccionar fecha Fin" />
                 </div>
                 <div class="col-sm-2 mb-2">
                     <label class="form-label">ID Transacción:</label>
-                    <input type="text" name="idtransaccion" id="txtidtransaccion" value="" />
+                    <input type="search" name="idtransaccion" id="txtidtransaccion" value="" class="form-control" placeholder="Ingrese ID Transacción" />
                 </div>
-                <div class="col-sm-2 mb-2 d-grid">
-                    <button type="button" id="btnbuscar" class="btn btn-dark"><i class="bi bi-search"></i> Buscar</button>
+                <div class="col-sm-3 mb-2 d-grid">
+                    <button type="button" id="btnbuscar" class="btn btn-dark form-control"><i class="bi bi-search"></i> Buscar</button>
                 </div>
-                <div class="col-sm-2 mb-2 d-grid">
-                    <button type="submit" id="btnbuscar" class="btn btn-success"><i class="bi bi-filetype-csv"></i> Exportar</button>
+                <div class="col-sm-3 mb-2 d-grid">
+                    <button type="submit" id="btnbuscar" class="btn btn-success form-control"><i class="bi bi-filetype-csv"></i> Exportar</button>
                 </div>
             </div>
         </form>
@@ -102,6 +102,19 @@
 
 @section Scripts {
     <script>
+        flatpickr("#txtfechainicio", {
+            locale: "es",
+            defaultDate: "today",
+            dateFormat: "d/m/Y",
+            allowInput: true
+        });
+
+        flatpickr("#txtfechafin", {
+            locale: "es",
+            defaultDate: "today",
+            dateFormat: "d/m/Y",
+            allowInput: true
+        });
          $(document).ready(function () {
             $.ajax({
                 url: '@Url.Action("VistaDashboard", "Home")',
