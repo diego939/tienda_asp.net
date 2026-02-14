@@ -104,5 +104,40 @@ namespace CapaNegocio
 			return objCD_Usuarios.Eliminar(id, out mensaje);
 			
 		}
+
+		public bool CambiarClave(int id, string nuevaClave, out string mensaje)
+		{
+			return objCD_Usuarios.CambiarClave(id, nuevaClave, out mensaje);
+		}
+
+		public bool ReestablecerClave(int id, string correo, out string mensaje)
+		{
+			mensaje = string.Empty;
+			string nuevaClave = CN_Recursos.GenerarClave();
+			bool resultado = objCD_Usuarios.ReestablecerClave(id, CN_Recursos.ConvertirSha256(nuevaClave), out mensaje);
+
+			if (resultado)
+			{
+				string asunto = "Contraseña Reestablecida";
+				string mensajeCorreo = "<h3>Su cuenta ha sido reestablecida exitosamente</h3><br></br><p>Su clave de acceso es: <strong>" + nuevaClave + "</strong></p>";
+				bool respuesta = CN_Recursos.EnviarCorreo(correo, asunto, mensajeCorreo);
+				if (respuesta)
+				{
+					mensaje = "Contraseña reestablecida y correo enviado";
+					return true;
+				}
+				else
+				{
+					mensaje = "No se pudo enviar el correo";
+					return false;
+				}
+			}
+			else
+			{
+				mensaje = "No se pudo reestablecer la contraseña";
+				return false;
+			}
+
+		}
 	}
 }

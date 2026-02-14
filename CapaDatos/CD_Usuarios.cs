@@ -20,7 +20,7 @@ namespace CapaDatos
             {
                 using (SqlConnection oconexion = new SqlConnection(Conexion.GetCadenaConexion()))
                 {
-                    string query = "select id, nombres, apellidos, correo, activo from usuario";
+                    string query = "select * from usuario";
                     SqlCommand cmd = new SqlCommand(query, oconexion);
                     cmd.CommandType = CommandType.Text;
                     oconexion.Open();
@@ -28,14 +28,16 @@ namespace CapaDatos
                     {
                         while (dr.Read())
                         {
-                            lista.Add(new Usuario()
-                            {
-                                id = Convert.ToInt32(dr["id"]),
-                                nombres = dr["nombres"].ToString(),
-                                apellidos = dr["apellidos"].ToString(),
-                                correo = dr["correo"].ToString(),
-                                activo = Convert.ToBoolean(dr["activo"])
-                            });
+							lista.Add(new Usuario()
+							{
+								id = Convert.ToInt32(dr["id"]),
+								nombres = dr["nombres"].ToString(),
+								apellidos = dr["apellidos"].ToString(),
+								correo = dr["correo"].ToString(),
+								clave = dr["clave"].ToString(),
+								restablecer = Convert.ToBoolean(dr["restablecer"]),
+								activo = Convert.ToBoolean(dr["activo"])
+							});
                         }
                     }
 				}
@@ -140,6 +142,76 @@ namespace CapaDatos
 					if (!resultado)
 					{
 						mensaje = "No se encontró el usuario para eliminar " + id;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				mensaje = ex.Message;
+			}
+
+			return resultado;
+		}
+
+		public bool CambiarClave(int id,string nuevaClave, out string mensaje)
+		{
+			bool resultado = false;
+			mensaje = string.Empty;
+
+			try
+			{
+				using (SqlConnection oconexion = new SqlConnection(Conexion.GetCadenaConexion()))
+				{
+					SqlCommand cmd = new SqlCommand(
+						"update usuario set clave = @nuevaClave, restablecer = 0 where id = @id",
+						oconexion
+					);
+
+					cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
+					cmd.Parameters.Add("@nuevaClave", SqlDbType.VarChar).Value = nuevaClave;
+					cmd.CommandType = CommandType.Text;
+
+					oconexion.Open();
+					resultado = cmd.ExecuteNonQuery() > 0;
+
+					if (!resultado)
+					{
+						mensaje = "No se pudo reestablecer la clave'Error en CD_Usuarios.CambiarClave ";
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				mensaje = ex.Message;
+			}
+
+			return resultado;
+		}
+
+		public bool ReestablecerClave(int id,string clave ,out string mensaje)
+		{
+			bool resultado = false;
+			mensaje = string.Empty;
+
+			try
+			{
+				using (SqlConnection oconexion = new SqlConnection(Conexion.GetCadenaConexion()))
+				{
+					SqlCommand cmd = new SqlCommand(
+						"update usuario set clave = @clave, restablecer = 1 where id = @id",
+						oconexion
+					);
+
+					cmd.Parameters.Add("@id", SqlDbType.Int).Value = id;
+					cmd.Parameters.Add("@clave", SqlDbType.VarChar).Value = clave;
+					cmd.CommandType = CommandType.Text;
+
+					oconexion.Open();
+					resultado = cmd.ExecuteNonQuery() > 0;
+
+					if (!resultado)
+					{
+						mensaje = "No se pudo reestablecer la clave'Error en CD_Usuarios.ReestablecerClave' ";
 					}
 				}
 			}
