@@ -1,6 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using CapaEntidad;
+﻿using CapaEntidad;
 using CapaNegocio;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace CapaPresentacionAdmin.Controllers
@@ -92,5 +93,34 @@ namespace CapaPresentacionAdmin.Controllers
 			}
 		}
 
+		[HttpPost]
+		public IActionResult ReestablecerClave( string correo)
+		{
+			Usuario? oUsuario = new Usuario();
+			oUsuario = new CN_Usuarios().Listar()
+			.Where(u => u.correo == correo)
+			.FirstOrDefault();
+
+			if (oUsuario == null)
+			{
+				ViewBag.ErrorMessage = "No se encontro un usuario con ese correo";
+				return View();
+			}
+
+			string mensaje = string.Empty;
+
+			bool respuesta = new CN_Usuarios().ReestablecerClave(oUsuario.id, correo, out mensaje);
+
+			if (respuesta)
+			{
+				ViewBag.Error = null;
+				return RedirectToAction("Index", "Acceso");
+			}
+			else
+			{
+				ViewBag.ErrorMessage = mensaje;
+				return View();
+			}
+		}	
 	}
 }
