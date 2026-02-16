@@ -121,6 +121,11 @@ namespace CapaPresentacionAdmin.Controllers
 				ViewBag.ErrorMessage = mensaje;
 				return View();
 			}
-		}	
+		}
+		
+		public ActionResult CerrarSesion()
+		{
+			return RedirectToAction("Index", "Acceso");
+		}
 	}
 }
