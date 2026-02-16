@@ -1,6 +1,10 @@
 using CapaDatos;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
+using Microsoft.AspNetCore.Authentication.Cookies;
+//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +16,17 @@ Conexion.SetCadenaConexion(
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+	.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+	{
+		options.LoginPath = "/Acceso/Index";
+		options.AccessDeniedPath = "/Acceso/Index";
+		options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+	});
+
+builder.Services.AddAuthorization();
+//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
 
 var app = builder.Build();
 
@@ -25,9 +40,10 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseRouting();
-
+app.UseAuthentication();
+//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
 app.UseAuthorization();
-
+//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
 app.MapStaticAssets();
 
 app.MapControllerRoute(

@@ -5,10 +5,15 @@ using CapaNegocio;
 using CapaEntidad;
 using System.Data;
 using ClosedXML.Excel;
+//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
+using Microsoft.AspNetCore.Authorization;
+//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
 
 namespace CapaPresentacionAdmin.Controllers
 {
-    public class HomeController : Controller
+
+	[Authorize]
+	public class HomeController : Controller
     {
         public IActionResult Index()
         {

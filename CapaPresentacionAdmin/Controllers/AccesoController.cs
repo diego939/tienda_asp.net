@@ -1,8 +1,11 @@
 ﻿using CapaEntidad;
 using CapaNegocio;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Security.Claims;
+//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
 
 namespace CapaPresentacionAdmin.Controllers
 {
@@ -48,6 +51,25 @@ namespace CapaPresentacionAdmin.Controllers
 				}
 				else
 				{
+					//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
+					var claims = new List<Claim>
+					{
+						new Claim(ClaimTypes.Name, oUsuario.correo),
+						new Claim("IdUsuario", oUsuario.id.ToString())
+					};
+
+					var identity = new ClaimsIdentity(
+						claims,
+						CookieAuthenticationDefaults.AuthenticationScheme);
+
+					var principal = new ClaimsPrincipal(identity);
+
+					HttpContext.SignInAsync(
+						CookieAuthenticationDefaults.AuthenticationScheme,
+						principal
+					).Wait();
+					//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
+
 					return RedirectToAction("Index", "Home");
 				}
 
@@ -125,6 +147,11 @@ namespace CapaPresentacionAdmin.Controllers
 		
 		public ActionResult CerrarSesion()
 		{
+			//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
+			HttpContext.SignOutAsync(
+				CookieAuthenticationDefaults.AuthenticationScheme
+			).Wait();
+			//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
 			return RedirectToAction("Index", "Acceso");
 		}
 	}

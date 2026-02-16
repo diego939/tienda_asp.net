@@ -2,9 +2,12 @@
 using CapaEntidad;
 using CapaNegocio;
 using Microsoft.AspNetCore.Mvc;
-
+//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
+using Microsoft.AspNetCore.Authorization;
+//AUTENTICACION METHODS -----------------------------------------------------------------------------------------
 namespace CapaPresentacionAdmin.Controllers
 {
+	[Authorize]
     public class MantenimientoController : Controller
     {
 		private readonly IWebHostEnvironment _env;
