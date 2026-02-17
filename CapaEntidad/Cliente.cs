@@ -23,6 +23,7 @@ namespace CapaEntidad
 		public string apellidos { get; set; }
 		public string correo { get; set; }	
 		public string clave { get; set; }
+		public string confirmarClave { get; set; }
 		public bool reestablecer { get; set; }
 
 	}
