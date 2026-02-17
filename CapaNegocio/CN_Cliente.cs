@@ -39,6 +39,8 @@ namespace CapaNegocio
 				return 0;
 			}
 
+			obj.clave = CN_Recursos.ConvertirSha256(obj.clave);
+
 			if (string.IsNullOrEmpty(mensaje))
 			{
 				return objCD_Clientes.Registrar(obj, out mensaje);

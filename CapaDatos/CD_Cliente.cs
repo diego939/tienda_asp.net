@@ -199,7 +199,7 @@ namespace CapaDatos
 				using (SqlConnection oconexion = new SqlConnection(Conexion.GetCadenaConexion()))
 				{
 					SqlCommand cmd = new SqlCommand(
-						"update cliente set clave = @clave, restablecer = 1 where id = @id",
+						"update cliente set clave = @clave, reestablecer = 1 where id = @id",
 						oconexion
 					);
 

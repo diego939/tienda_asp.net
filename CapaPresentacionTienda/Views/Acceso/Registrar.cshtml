@@ -1,0 +1,97 @@
+﻿@model CapaEntidad.Cliente
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Registrar</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/login.css" asp-append-version="true" />
+    <link href="~/css/site.css" rel="stylesheet" />
+</head>
+<body class="fondo">
+    <div id="layoutAuthentication">
+        <div id="layoutAuthentication_content">
+            <main>
+                <div class="container">
+                    <div class="d-flex justify-content-center align-items-center vh-100">
+                        <div class="col-lg-5">
+                            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                                <div class="d-flex justify-content-center align-items-center mt-5">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" class="bi bi-person-fill-add" viewBox="0 0 16 16">
+                                        <path d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0m-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                                        <path d="M2 13c0 1 1 1 1 1h5.256A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1 1.544-3.393Q8.844 9.002 8 9c-5 0-6 3-6 4" />
+                                    </svg>
+                                </div>
+                                <h3 class="text-center font-weight-light my-4">REGISTRARME</h3>
+                                <div class="card-body">
+                                    <form action="@Url.Action("Registrar", "Acceso")" method="post">
+
+                                        <div class="form-floating mb-3">
+                                            @Html.TextBoxFor(m => m.nombre, new {@class = "form-control",placeholder = "Nombres",required = "required"})
+                                            @Html.LabelFor(m => m.nombre, "Nombres")
+                                            @Html.ValidationMessageFor(m => m.nombre, "", new { @class = "text-danger" })
+                                        </div>
+
+                                        <div class="form-floating mb-3">
+                                            @Html.TextBoxFor(m => m.apellidos, new {@class = "form-control",placeholder = "Apellidos",required = "required"})
+                                            @Html.LabelFor(m => m.apellidos, "Apellidos")
+                                            @Html.ValidationMessageFor(m => m.apellidos, "", new { @class = "text-danger" })
+                                        </div>
+
+                                        <div class="form-floating mb-3">
+                                            @Html.TextBoxFor(m => m.correo, new {@class = "form-control",type = "email",placeholder = "Correo",required = "required"})
+                                            @Html.LabelFor(m => m.correo, "Correo")
+                                            @Html.ValidationMessageFor(m => m.correo, "", new { @class = "text-danger" })
+                                        </div>
+
+                                        <div class="form-floating mb-3">
+                                            @Html.PasswordFor(m => m.clave, new {@class = "form-control",placeholder = "Contraseña",required = "required"})
+                                            @Html.LabelFor(m => m.clave, "Contraseña")
+                                            @Html.ValidationMessageFor(m => m.clave, "", new { @class = "text-danger" })
+                                        </div>
+
+                                        <div class="form-floating mb-3">
+                                            @Html.PasswordFor(m => m.confirmarClave,
+                                            new { @class = "form-control", placeholder = "Confirmar Contraseña", required = "required" })
+                                            @Html.LabelFor(m => m.confirmarClave, "Confirmar Contraseña")
+                                        </div>
+
+
+                                        @if (ViewBag.ErrorMensaje != null)
+                                        {
+                                            <div class="alert alert-danger text-center">
+                                                @ViewBag.ErrorMensaje
+                                            </div>
+                                        }
+
+
+                                        <div class="d-flex align-items-center justify-content-center mt-4 mb-0">
+                                            ¿Ya tenés cuenta? <a class="fw-semibold text-decoration-none p-2" href="@Url.Action("Index", "Acceso")">Iniciar Sesión</a>
+                                        </div>
+
+                                        <hr />
+
+                                        <div class="d-grid mt-4 mb-0">
+                                            <button class="btn btn-dark bg-gradient shadow-sm" type="submit">
+                                                REGISTRARME
+                                            </button>
+                                        </div>
+
+                                    </form>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

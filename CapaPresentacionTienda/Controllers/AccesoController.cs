@@ -131,7 +131,6 @@ namespace CapaPresentacionTienda.Controllers
 				ViewBag.ErrorMessage = "Las contraseñas nuevas no coinciden";
 				return View();
 			}
-			nuevaclave = CN_Recursos.ConvertirSha256(nuevaclave);
 			string mensaje = string.Empty;
 
 			bool respuesta = new CN_Cliente().CambiarClave(int.Parse(id), nuevaclave, out mensaje);
@@ -155,6 +154,7 @@ namespace CapaPresentacionTienda.Controllers
 			oCliente = new CN_Cliente().Listar()
 			.Where(u => u.correo == correo)
 			.FirstOrDefault();
+			Console.WriteLine("ID encontrado: " + oCliente.id);
 
 			if (oCliente == null)
 			{
