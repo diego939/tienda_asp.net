@@ -35,7 +35,7 @@ namespace CapaPresentacionTienda.Controllers
 			Cliente? oCliente = new Cliente();
 			oCliente = new CN_Cliente().Listar()
 			.Where(c => c.correo.Trim().ToLower() == correo.Trim().ToLower()
-			&& u.clave == CN_Recursos.ConvertirSha256(clave))
+			&& c.clave == CN_Recursos.ConvertirSha256(clave))
 			.FirstOrDefault();
 
 			string hashIngresado = CN_Recursos.ConvertirSha256(clave);
@@ -153,7 +153,7 @@ namespace CapaPresentacionTienda.Controllers
 		{
 			Cliente? oCliente = new Cliente();
 			oCliente = new CN_Cliente().Listar()
-			.Where(u => u.id == int.Parse(id))
+			.Where(u => u.correo == correo)
 			.FirstOrDefault();
 
 			if (oCliente == null)
