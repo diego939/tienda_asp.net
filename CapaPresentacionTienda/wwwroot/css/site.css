@@ -3921,11 +3921,11 @@ textarea.form-control-lg {
     --bs-dropdown-border-color: var(--bs-border-color-translucent);
     --bs-dropdown-box-shadow:;
     --bs-dropdown-link-color: #dee2e6;
-    --bs-dropdown-link-hover-color: #fff;
+    --bs-dropdown-link-hover-color: #000;
     --bs-dropdown-divider-bg: var(--bs-border-color-translucent);
-    --bs-dropdown-link-hover-bg: rgba(255, 255, 255, 0.15);
-    --bs-dropdown-link-active-color: #fff;
-    --bs-dropdown-link-active-bg: #0d6efd;
+    --bs-dropdown-link-hover-bg: blue;
+    --bs-dropdown-link-active-color: #000;
+    --bs-dropdown-link-active-bg: #red;
     --bs-dropdown-link-disabled-color: #adb5bd;
     --bs-dropdown-header-color: #adb5bd;
 }
