@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CapaPresentacionTienda.Controllers
 {
+	[ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 	public class TiendaController : Controller
 	{
 		// GET: TiendaController
