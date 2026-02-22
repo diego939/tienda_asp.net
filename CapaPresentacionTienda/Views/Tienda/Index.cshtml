@@ -131,10 +131,20 @@
             $.ajax({
                 url: '@Url.Action("ListaCategorias", "Tienda")',
                 type: "GET",
+
+                beforeSend: function () {
+                    $("#contenedorCategoria").LoadingOverlay("Show", {
+                        text: "Cargando categorías..."
+                    });
+                },
+
+                complete: function () {
+                    $("#contenedorCategoria").LoadingOverlay("Hide");
+                },
+
                 success: function (response) {
 
                     $("#contenedorCategoria").empty();
-
                     // opción todos
                     $("#contenedorCategoria").append(`
                         <div class="form-check">
@@ -173,6 +183,17 @@
                 url: '@Url.Action("ListarMarcaPorCategoria", "Tienda")',
                 type: "POST",
                 data: { idCategoria: idCategoria },
+
+                beforeSend: function () {
+                    $("#contenedorMarca").LoadingOverlay("Show", {
+                        text: "Cargando marcas..."
+                    });
+                },
+
+                complete: function () {
+                    $("#contenedorMarca").LoadingOverlay("Hide");
+                },
+
                 success: function (response) {
 
                     $("#contenedorMarca").empty();
@@ -210,11 +231,24 @@
                     idCategoria: idCategoria,
                     idMarca: idMarca
                 },
+
+                beforeSend: function () {
+                    $("#contenedorProducto")
+                        .css("min-height", "80%")
+                        .LoadingOverlay("Show", {
+                            text: "Cargando productos..."
+                        });
+                },
+
+                complete: function () {
+                    $("#contenedorProducto").LoadingOverlay("Hide");
+                },
+
                 success: function (response) {
-                    console.log("Respuesta:", response);
 
                     $("#contenedorProducto").empty();
 
+                    if (response.data.length > 0) {
                     $.each(response.data, function (i, item) {
 
                         let imagen = item.base64 != ""
@@ -243,7 +277,13 @@
                         `);
 
                     });
-
+                    }else{
+                             $("#contenedorProducto").html(`
+                             <div class="col-12 d-flex justify-content-center align-items-center" style="min-height: 400px;">
+                                <h5>No se encontraron productos</h5>
+                             </div>
+                            `);
+                    }
                 }
             });
 
