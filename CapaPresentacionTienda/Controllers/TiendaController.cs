@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using CapaEntidad;
+using CapaNegocio;
 
 namespace CapaPresentacionTienda.Controllers
 {
@@ -12,73 +14,88 @@ namespace CapaPresentacionTienda.Controllers
 			return View();
 		}
 
-		// GET: TiendaController/Details/5
-		public ActionResult Details(int id)
+		[HttpGet]
+		public JsonResult ListaCategorias()
 		{
-			return View();
+			List<Categoria> listaCategoria = new List<Categoria>();
+
+			listaCategoria = new CN_Categoria().Listar();
+
+			return Json(new { data = listaCategoria });
+
 		}
 
-		// GET: TiendaController/Create
-		public ActionResult Create()
-		{
-			return View();
-		}
-
-		// POST: TiendaController/Create
 		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public ActionResult Create(IFormCollection collection)
+		public JsonResult ListarMarcaPorCategoria(int idCategoria)
 		{
-			try
-			{
-				return RedirectToAction(nameof(Index));
-			}
-			catch
-			{
-				return View();
-			}
+			List<Marca> listaMarca = new List<Marca>();
+
+			listaMarca = new CN_Marca().ListarMarcaPorCategoria(idCategoria);
+
+			return Json(new { data = listaMarca });
+
 		}
 
-		// GET: TiendaController/Edit/5
-		public ActionResult Edit(int id)
-		{
-			return View();
-		}
-
-		// POST: TiendaController/Edit/5
 		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public ActionResult Edit(int id, IFormCollection collection)
+		public JsonResult ListarProducto(int idCategoria, int idMarca)
 		{
-			try
+			List<Producto> listaProducto = new List<Producto>();
+			bool conversion;
+
+			CN_Producto cnProducto = new CN_Producto();
+
+			listaProducto = cnProducto.Listar()
+				.Select(producto =>
+				{
+					// 🔥 Construimos la ruta física real
+					string rutaFisica = Path.Combine(
+						Directory.GetCurrentDirectory(),
+						"wwwroot",
+						producto.ruta_imagen.TrimStart('/').Replace("/", Path.DirectorySeparatorChar.ToString())
+					);
+
+					Console.WriteLine("Ruta física: " + rutaFisica);
+					Console.WriteLine("Existe archivo: " + System.IO.File.Exists(rutaFisica));
+
+					return new Producto()
+					{
+						id = producto.id,
+						nombre = producto.nombre,
+						descripcion = producto.descripcion,
+						oMarca = producto.oMarca,
+						oCategoria = producto.oCategoria,
+						precio = producto.precio,
+						stock = producto.stock,
+						ruta_imagen = producto.ruta_imagen,
+						nombre_imagen = producto.nombre_imagen,
+						base64 = CN_Recursos.ConvertirBase64(rutaFisica, out conversion),
+						extension = Path.GetExtension(producto.nombre_imagen),
+						activo = producto.activo
+					};
+				})
+				.Where(producto =>
+					(idCategoria == 0 || producto.oCategoria.id == idCategoria) &&
+					(idMarca == 0 || producto.oMarca.id == idMarca) &&
+					producto.stock > 0 &&
+					producto.activo)
+				.ToList();
+
+			var listaFinal = listaProducto.Select(p => new
 			{
-				return RedirectToAction(nameof(Index));
-			}
-			catch
-			{
-				return View();
-			}
+				p.id,
+				p.nombre,
+				p.descripcion,
+				Marca = p.oMarca.descripcion,
+				Categoria = p.oCategoria.descripcion,
+				p.precio,
+				p.stock,
+				p.activo,
+				p.base64,
+				p.extension
+			}).ToList();
+
+			return Json(new { data = listaFinal });
 		}
 
-		// GET: TiendaController/Delete/5
-		public ActionResult Delete(int id)
-		{
-			return View();
-		}
-
-		// POST: TiendaController/Delete/5
-		[HttpPost]
-		[ValidateAntiForgeryToken]
-		public ActionResult Delete(int id, IFormCollection collection)
-		{
-			try
-			{
-				return RedirectToAction(nameof(Index));
-			}
-			catch
-			{
-				return View();
-			}
-		}
 	}
 }

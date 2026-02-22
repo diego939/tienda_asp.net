@@ -34,8 +34,8 @@ namespace CapaEntidad
 		public string ruta_imagen { get; set; }
 		public string nombre_imagen { get; set; }
 		public bool activo { get; set; }
-		public decimal base64 { get; set; }
+		public string base64 { get; set; }
 
-		public decimal extension { get; set; }
+		public string extension { get; set; }
 	}
 }

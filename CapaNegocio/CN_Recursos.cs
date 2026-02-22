@@ -64,21 +64,26 @@ namespace CapaNegocio
         }
 
 		//USAR MAS ADELANTE PARA CONVERTIR LA IMAGEN A BASE64 PARA GUARDARLA EN LA BASE DE DATOS
-		public static string ConvertirBase64(string texto, out bool conversion)
-        {
-            string resultadoBase64 = string.Empty;
-            conversion = true;
-            try
-            {
-                byte[] textoBytes = Encoding.UTF8.GetBytes(texto);
-                resultadoBase64 = Convert.ToBase64String(textoBytes);
+		public static string ConvertirBase64(string ruta, out bool conversion)
+		{
+			conversion = false;
+			string base64 = string.Empty;
 
-            }
-            catch (Exception)
-            {
-                conversion = false;
-            }
-            return resultadoBase64;
-        }
-    }
+			try
+			{
+				if (File.Exists(ruta))
+				{
+					byte[] bytes = File.ReadAllBytes(ruta);
+					base64 = Convert.ToBase64String(bytes);
+					conversion = true;
+				}
+			}
+			catch
+			{
+				conversion = false;
+			}
+
+			return base64;
+		}
+	}
 }
