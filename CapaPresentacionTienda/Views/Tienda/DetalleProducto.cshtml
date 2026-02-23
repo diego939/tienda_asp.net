@@ -1,0 +1,102 @@
+﻿@model CapaEntidad.Producto
+
+@{
+    ViewData["Title"] = "Detalle del Producto";
+}
+
+<section class="py-5">
+    <div class="container px-4 px-lg-5 my-5">
+
+        @if (Model != null)
+        {
+            <div class="row gx-4 gx-lg-5 align-items-center">
+
+                <!-- Imagen -->
+                <div class="col-md-6 text-center">
+                    @{
+                        string imagen = !string.IsNullOrEmpty(Model.base64)
+                        ? $"data:image/{Model.extension.Replace(".", "")};base64,{Model.base64}"
+                        : "https://dummyimage.com/600x700/dee2e6/6c757d.jpg";
+                    }
+
+                    <img class="card-img-top mb-5 mb-md-0 img-fluid rounded shadow"
+                         src="@imagen"
+                         alt="@Model.nombre" />
+                </div>
+
+                <!-- Información -->
+                <div class="col-md-6">
+
+                    <div class="small mb-1 text-muted">
+                        Categoría: @Model.oCategoria?.descripcion
+                    </div>
+
+                    <div class="small mb-3 text-muted">
+                        Marca: @Model.oMarca?.descripcion
+                    </div>
+
+                    <h1 class="display-5 fw-bolder">
+                        @Model.nombre
+                    </h1>
+
+                    <div class="fs-4 mb-4 text-success fw-bold">
+                        $@Model.precio
+                    </div>
+
+                    <p class="lead">
+                        @Model.descripcion
+                    </p>
+
+                    <div class="mb-3">
+                        <span class="badge bg-dark">
+                            Stock disponible: @Model.stock
+                        </span>
+                    </div>
+
+                    <div class="d-flex gap-3">
+
+                        <input class="form-control text-center"
+                               id="inputQuantity"
+                               type="number"
+                               value="1"
+                               min="1"
+                               max="@Model.stock"
+                               style="max-width: 5rem" />
+
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <button class="btn btn-outline-dark flex-shrink-0">
+                                <i class="bi-cart-fill me-1"></i>
+                                Agregar al carrito
+                            </button>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Index", "Acceso")" class="btn">
+                                Iniciar sesión para comprar
+                            </a>
+                        }
+
+                    </div>
+
+                    <div class="mt-4">
+                        <a href="@Url.Action("Index", "Tienda")" class="btn btn-outline-danger">
+                            ← Volver a la tienda
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <h3 class="text-danger">Producto no encontrado</h3>
+                <a href="@Url.Action("Index", "Tienda")" class="btn btn-outline-danger mt-3">
+                    Volver a la tienda
+                </a>
+            </div>
+        }
+
+    </div>
+</section>

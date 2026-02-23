@@ -124,6 +124,8 @@
 
         });
 
+        var usuarioAutenticado = @(User.Identity != null && User.Identity.IsAuthenticated ? "true" : "false");
+
 
         // ================= CATEGORIAS =================
         function cargarCategorias() {
@@ -266,10 +268,16 @@
                                         </div>
                                     </div>
                                     <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                        <div class="text-center">
-                                            <button class="btn btn-outline-dark mt-auto">
-                                                Agregar al carrito
-                                            </button>
+                                        <div class="d-grid gap-2">
+                                            <a href="@Url.Action("DetalleProducto","Tienda")?id=${item.id}" class="btn btn-outline-success">
+                                                Ver detalle
+                                            </a>
+                                            ${usuarioAutenticado
+                                                ? `<button class="btn btn-outline-dark">
+                                                        Agregar al carrito
+                                                   </button>`
+                                                : ""
+                                            }
                                         </div>
                                     </div>
                                 </div>

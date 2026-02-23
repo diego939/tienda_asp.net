@@ -14,6 +14,34 @@ namespace CapaPresentacionTienda.Controllers
 			return View();
 		}
 
+		public ActionResult DetalleProducto(int id = 0)
+		{
+			Producto? oProducto = new CN_Producto().Listar()
+									.FirstOrDefault(p => p.id == id);
+
+			if (oProducto == null)
+				return View(null);
+
+			bool conversion;
+
+			string rutaFisica = Path.Combine(
+				Directory.GetCurrentDirectory(),
+				"wwwroot",
+				oProducto.ruta_imagen.TrimStart('/').Replace("/", Path.DirectorySeparatorChar.ToString())
+			);
+
+			Console.WriteLine("Ruta física detalle: " + rutaFisica);
+			Console.WriteLine("Existe archivo detalle: " + System.IO.File.Exists(rutaFisica));
+
+			oProducto.base64 = System.IO.File.Exists(rutaFisica)
+				? CN_Recursos.ConvertirBase64(rutaFisica, out conversion)
+				: "";
+
+			oProducto.extension = Path.GetExtension(oProducto.nombre_imagen);
+
+			return View(oProducto);
+		}
+
 		[HttpGet]
 		public JsonResult ListaCategorias()
 		{
