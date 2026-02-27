@@ -128,9 +128,9 @@
 
                                         <!-- Eliminar -->
                                         <div class="col-md-2 col-6 mt-3 mt-md-0 text-end">
-                                            <button class="btn btn-outline-danger"
+                                            <button class="btn btn-outline-danger rounded-circle"
                                                     onclick="eliminar(${item.id})">
-                                                <i class="fa-solid fa-trash"></i>
+                                                <i class="fa-solid fa-x"></i>
                                             </button>
                                         </div>
 
@@ -207,7 +207,7 @@
 				success: function(response){
 					if(response.respuesta){
 						actualizarContador(response.cantidad);
-                        mostrarToast("success", "Producto eliminado");
+                        mostrarToast("success", "Producto quitado");
 						cargarCarrito();
 					}else{
                         mostrarToast("error", response.mensaje);

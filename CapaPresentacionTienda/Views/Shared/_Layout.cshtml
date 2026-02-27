@@ -28,8 +28,9 @@
                     <form class="d-flex">
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            <a href="@Url.Action("Carrito", "Tienda")"
-                               class="btn btn-outline-dark m-1 d-none d-lg-inline-block position-relative">
+                            <button type="button"
+                                    onclick="window.location.href='@Url.Action("Carrito", "Tienda")'"
+                                    class="btn btn-outline-dark m-1 d-none d-lg-inline-block position-relative">
 
                                 <i class="bi-cart-fill me-1"></i>
                                 Carrito
@@ -38,7 +39,7 @@
                                       class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                                     0
                                 </span>
-                            </a>
+                            </button>
                             <div class="btn-group dropstart d-none d-lg-inline-block">
                                 <button type="button"
                                         class="btn btn-outline-dark rounded-pill"
@@ -69,17 +70,18 @@
                                 </ul>
                             </div>
                             <!-- Visible solo en mobile -->
-                            <a href="@Url.Action("Carrito", "Tienda")"
-                               class="btn btn-outline-dark mb-2 d-lg-none w-100 rounded-pill position-relative">
+                            <button type="button"
+                                    onclick="window.location.href='@Url.Action("Carrito", "Tienda")'"
+                                    class="btn btn-outline-dark mb-2 d-lg-none w-100 rounded-pill position-relative">
 
                                 <i class="bi-cart-fill me-1"></i>
                                 Carrito
 
                                 <span id="cantidadCarritoMobile"
-                                      class="badge bg-danger text-white ms-1 rounded-pill">
+                                      class="badge bg-danger text-white ms-1 rounded-pill" ">
                                     0
                                 </span>
-                            </a>
+                            </button>
                             <div class="btn-group d-lg-none text-center w-100">
                                 <button type="button"
                                         class="btn btn-outline-dark rounded-pill"
