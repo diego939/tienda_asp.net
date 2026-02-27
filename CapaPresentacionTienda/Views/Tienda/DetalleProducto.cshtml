@@ -55,17 +55,31 @@
 
                     <div class="d-flex gap-3">
 
-                        <input class="form-control text-center"
-                               id="inputQuantity"
-                               type="number"
-                               value="1"
-                               min="1"
-                               max="@Model.stock"
-                               style="max-width: 5rem" />
+                        <div class="input-group" style="max-width: 100px;">
+
+                            <button class="btn btn-outline-dark"
+                                    type="button"
+                                    onclick="cambiarCantidad(-1)">
+                                -
+                            </button>
+
+                            <input type="text"
+                                   id="inputQuantity"
+                                   class="form-control text-center"
+                                   value="1"
+                                   readonly />
+
+                            <button class="btn btn-outline-dark"
+                                    type="button"
+                                    onclick="cambiarCantidad(1)">
+                                +
+                            </button>
+
+                        </div>
 
                         @if (User.Identity != null && User.Identity.IsAuthenticated)
                         {
-                            <button class="btn btn-outline-dark flex-shrink-0">
+                            <button class="btn btn-outline-dark flex-shrink-0" onclick="agregarDetalle(@Model.id)">
                                 <i class="bi-cart-fill me-1"></i>
                                 Agregar al carrito
                             </button>
@@ -100,3 +114,68 @@
 
     </div>
 </section>
+
+@section scripts{
+    <script>
+        function agregarDetalle(idProducto){
+
+            let cantidad = $("#inputQuantity").val();
+
+            $.ajax({
+                url: '@Url.Action("AgregarCarrito", "Tienda")',
+                type: "POST",
+                data: {
+                    idProducto: idProducto,
+                    cantidad: cantidad
+                },
+                success: function(response){
+                    if(response.respuesta){
+                        actualizarContador(response.cantidad);
+                        mostrarToast('success', 'Producto agregado');
+                    }else{
+                        mostrarToast('error', response.mensaje);
+                    }
+                }
+            });
+        }
+
+        function cambiarCantidad(cambio){
+
+            let input = $("#inputQuantity");
+            let cantidadActual = parseInt(input.val());
+            let stock = @Model.stock;
+
+            let nuevaCantidad = cantidadActual + cambio;
+
+            // 🚫 No menor a 1
+            if(nuevaCantidad < 1){
+                Swal.fire({
+                    toast: true,
+                    position: 'top',
+                    icon: 'warning',
+                    title: 'La cantidad mínima es 1',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+                return;
+            }
+
+            // 🚫 No mayor al stock
+            if(nuevaCantidad > stock){
+                Swal.fire({
+                    toast: true,
+                    position: 'top',
+                    icon: 'warning',
+                    title: 'Stock máximo alcanzado',
+                    showConfirmButton: false,
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+                return;
+            }
+
+            input.val(nuevaCantidad);
+        }
+    </script>
+}

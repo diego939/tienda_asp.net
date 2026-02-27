@@ -42,6 +42,14 @@ namespace CapaPresentacionTienda.Controllers
 			return View(oProducto);
 		}
 
+		public ActionResult Carrito()
+		{
+			if (User.Identity == null || !User.Identity.IsAuthenticated)
+				return RedirectToAction("Index", "Acceso");
+
+			return View();
+		}
+
 		[HttpGet]
 		public JsonResult ListaCategorias()
 		{
@@ -123,6 +131,97 @@ namespace CapaPresentacionTienda.Controllers
 			}).ToList();
 
 			return Json(new { data = listaFinal });
+		}
+
+		[HttpPost]
+		public JsonResult AgregarCarrito(int idProducto, int cantidad)
+		{
+			string mensaje = string.Empty;
+			bool respuesta = false;
+
+			if (!User.Identity.IsAuthenticated)
+				return Json(new { respuesta = false, mensaje = "Debe iniciar sesión." });
+
+			int idCliente = int.Parse(User.FindFirst("id").Value);
+
+			Carrito obj = new Carrito()
+			{
+				oCliente = new Cliente() { id = idCliente },
+				oProducto = new Producto() { id = idProducto },
+				cantidad = cantidad
+			};
+
+			respuesta = new CN_Carrito().Agregar(obj, out mensaje);
+
+			int nuevaCantidad = new CN_Carrito().CantidadEnCarrito(idCliente);
+
+			return Json(new
+			{
+				respuesta = respuesta,
+				mensaje = mensaje,
+				cantidad = nuevaCantidad
+			});
+		}
+
+		[HttpGet]
+		public JsonResult ListarCarrito()
+		{
+			if (!User.Identity.IsAuthenticated)
+				return Json(new { data = new List<object>() });
+
+			int idCliente = int.Parse(User.FindFirst("id").Value);
+
+			var lista = new CN_Carrito().Listar(idCliente);
+
+			var listaFinal = lista.Select(c => new
+			{
+				c.id, // id del carrito
+				idProducto = c.oProducto.id, // 👈 AGREGAR ESTO
+				imagen = c.oProducto.ruta_imagen,
+				producto = c.oProducto.nombre,
+				c.cantidad,
+				precio = c.oProducto.precio,
+				total = c.cantidad * c.oProducto.precio
+			}).ToList();
+
+			return Json(new { data = listaFinal });
+		}
+
+		[HttpPost]
+		public JsonResult EliminarCarrito(int idCarrito)
+		{
+			string mensaje = string.Empty;
+			bool respuesta = new CN_Carrito().Eliminar(idCarrito, out mensaje);
+
+			int idCliente = int.Parse(User.FindFirst("id").Value);
+			int nuevaCantidad = new CN_Carrito().CantidadEnCarrito(idCliente);
+
+			return Json(new
+			{
+				respuesta = respuesta,
+				mensaje = mensaje,
+				cantidad = nuevaCantidad
+			});
+		}
+
+		[HttpGet]
+		public JsonResult ObtenerCantidadCarrito()
+		{
+			int cantidad = 0;
+
+			if (!User.Identity.IsAuthenticated)
+				return Json(new { cantidad = 0 });
+
+			var claimId = User.FindFirst("id");
+
+			if (claimId == null)
+				return Json(new { cantidad = 0 });
+
+			int idCliente = int.Parse(claimId.Value);
+
+			cantidad = new CN_Carrito().CantidadEnCarrito(idCliente);
+
+			return Json(new { cantidad = cantidad });
 		}
 
 	}

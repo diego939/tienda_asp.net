@@ -273,9 +273,10 @@
                                                 Ver detalle
                                             </a>
                                             ${usuarioAutenticado
-                                                ? `<button class="btn btn-outline-dark">
-                                                        Agregar al carrito
-                                                   </button>`
+                                                        ? `<button class="btn btn-outline-dark"
+                                                            onclick="agregarCarrito(${item.id},1)">
+                                                            Agregar al carrito
+                                                        </button>`
                                                 : ""
                                             }
                                         </div>
@@ -295,6 +296,44 @@
                 }
             });
 
+        }
+
+        function agregarCarrito(idProducto, cantidad){
+
+            $.ajax({
+                url: '@Url.Action("AgregarCarrito", "Tienda")',
+                type: "POST",
+                data: {
+                    idProducto: idProducto,
+                    cantidad: cantidad
+                },
+                success: function(response){
+
+                    if(response.respuesta){
+
+                        actualizarContador(response.cantidad);
+
+                        mostrarToast(
+                            'success',
+                            response.mensaje || 'Producto agregado correctamente'
+                        );
+
+                    }else{
+
+                        mostrarToast(
+                            'error',
+                            response.mensaje || 'Ocurrió un error'
+                        );
+
+                    }
+                },
+                error: function(){
+                    mostrarToast(
+                        'error',
+                        'Error inesperado en el servidor'
+                    );
+                }
+            });
         }
     </script>
 }

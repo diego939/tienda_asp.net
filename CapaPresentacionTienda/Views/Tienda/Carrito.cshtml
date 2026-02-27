@@ -1,0 +1,250 @@
+﻿@{
+	ViewData["Title"] = "Mi Carrito";
+}
+
+<section class="min-vh-80 py-4">
+    <div class="container">
+        <div class="row">
+
+            <!-- 🛒 LISTA PRODUCTOS -->
+            <div class="col-lg-8">
+                <div id="contenedorProductos"></div>
+            </div>
+
+            <!-- 💰 RESUMEN -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm resumen-card">
+                    <div class="card-body">
+                        <h5 class="mb-4">Resumen de Compra</h5>
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <span>$<span id="subtotal">0</span></span>
+                        </div>
+
+                        <hr>
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <strong>Total</strong>
+                            <strong>$<span id="totalGeneral">0</span></strong>
+                        </div>
+
+                        <button class="btn btn-dark w-100">
+                            Finalizar Compra
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+@section scripts {
+	<script>
+
+		$(document).ready(function(){
+			cargarCarrito();
+		});
+
+        function cargarCarrito(){
+
+            $.ajax({
+                url: '@Url.Action("ListarCarrito", "Tienda")',
+                type: "GET",
+                success: function(response){
+                        console.log("Response completo:", response);
+        console.log("Data:", response.data);
+
+                    $("#contenedorProductos").empty();
+
+                    let totalGeneral = 0;
+
+
+                    if (!response.data || response.data.length === 0) {
+
+                        $("#contenedorProductos").html(`
+                            <div class="card p-5 text-center shadow-sm">
+                                <h5>🛒 Tu carrito está vacío</h5>
+                                <p class="text-muted">Agregá productos para comenzar</p>
+                            </div>
+                        `);
+
+                        $("#subtotal").text("0.00");
+                        $("#totalGeneral").text("0.00");
+                        return;
+                    }
+
+                    $.each(response.data, function(i, item){
+
+                        totalGeneral += item.total;
+
+                        $("#contenedorProductos").append(`
+                            <div class="card mb-3 shadow-sm producto-card">
+                                <div class="card-body">
+                                    <div class="row align-items-center">
+
+                                        <!-- Imagen -->
+                                        <div class="col-md-2 col-4">
+                                            <img src="${item.imagen}"
+                                                 class="img-fluid rounded"
+                                                 alt="${item.producto}">
+                                        </div>
+
+                                        <!-- Info -->
+                                        <div class="col-md-3 col-8">
+                                            <h6 class="mb-1">${item.producto}</h6>
+                                            <small class="text-muted">Precio unitario</small>
+                                            <div>$${item.precio}</div>
+                                        </div>
+
+                                        <!-- Cantidad -->
+                                        <div class="col-md-3 col-12 mt-3 mt-md-0">
+                                            <div class="input-group cantidad-group">
+
+                                                <button class="btn btn-outline-dark"
+                                                    onclick="modificarCantidad(${item.idProducto}, -1)">
+                                                    -
+                                                </button>
+
+                                                <input type="text"
+                                                       class="form-control text-center"
+                                                       value="${item.cantidad}"
+                                                       readonly>
+
+                                                <button class="btn btn-outline-dark"
+                                                    onclick="modificarCantidad(${item.idProducto}, 1)">
+                                                    +
+                                                </button>
+
+                                            </div>
+                                        </div>
+
+                                        <!-- Total -->
+                                        <div class="col-md-2 col-6 mt-3 mt-md-0 text-md-center">
+                                            <strong>$${item.total}</strong>
+                                        </div>
+
+                                        <!-- Eliminar -->
+                                        <div class="col-md-2 col-6 mt-3 mt-md-0 text-end">
+                                            <button class="btn btn-outline-danger"
+                                                    onclick="eliminar(${item.id})">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    });
+
+                    $("#subtotal").text(totalGeneral.toFixed(2));
+                    $("#totalGeneral").text(totalGeneral.toFixed(2));
+                }
+            });
+        }
+
+        function modificarCantidad(idProducto, cambio){
+
+            if(!idProducto) return;
+
+            agregarCarrito(idProducto, cambio);
+
+            setTimeout(function(){
+                cargarCarrito();
+            }, 300);
+        }
+
+        function agregarCarrito(idProducto,cantidad){
+
+            $.ajax({
+                url: '@Url.Action("AgregarCarrito", "Tienda")',
+                type: "POST",
+                data: {
+                    idProducto: idProducto,
+                    cantidad: cantidad
+                },
+                success: function(response){
+                    if(response.respuesta){
+
+                        actualizarContador(response.cantidad);
+
+                        Swal.fire({
+                            toast: true,
+                            position: 'top',
+                            icon: 'success',
+                            title: 'Cantidad actualizada',
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
+
+                    }else{
+
+                        Swal.fire({
+                            toast: true,
+                            position: 'top',
+                            icon: 'error',
+                            title: response.mensaje,
+                            showConfirmButton: false,
+                            timer: 2000,
+                            timerProgressBar: true
+                        });
+
+                    }
+                }
+            });
+        }
+
+		function eliminar(idCarrito){
+
+			$.ajax({
+				url: '@Url.Action("EliminarCarrito", "Tienda")',
+				type: "POST",
+				data: { idCarrito: idCarrito },
+				success: function(response){
+					if(response.respuesta){
+						actualizarContador(response.cantidad);
+						Swal.fire({
+								icon: "success",
+								title: "Eliminado",
+								text: response.mensaje
+						})
+						cargarCarrito();
+					}else{
+						Swal.fire({
+								icon: "error",
+								title: "Error",
+								text: response.mensaje
+						})
+					}
+				}
+			});
+		}
+
+
+	</script>
+}
+
+<style>
+    .producto-card {
+        border-radius: 12px;
+        border: none;
+    }
+
+    .resumen-card {
+        border-radius: 15px;
+        border: none;
+        position: sticky;
+        top: 20px;
+    }
+
+    .cantidad-group button {
+        width: 40px;
+    }
+
+    .cantidad-group input {
+        max-width: 60px;
+    }
+</style>
