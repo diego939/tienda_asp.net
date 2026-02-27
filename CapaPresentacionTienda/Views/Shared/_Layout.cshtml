@@ -16,13 +16,13 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
     <!-- Navigation-->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top border-bottom">
         <div class="container-fluid px-4 px-lg-5">
-            <a class="navbar-brand" href="#!">Tienda Online</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
+            <button class="navbar-brand btn btn-dark bg-black text-white" onclick="window.location.href='@Url.Action("Index", "Tienda")'"><i class="bi bi-bag-heart"></i> Tienda</button>
+            <button class="navbar-toggler border border-dark text-black" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
-                    <li class="nav-item"><a class="nav-link active" aria-current="page" href="@Url.Action("Index", "Tienda")">Inicio</a></li>
+                    @*<li class="nav-item"><a class="nav-link active" aria-current="page" href="@Url.Action("Index", "Tienda")">Inicio</a></li>*@
                 </ul>
                 <form class="form-inline my-2 my-lg-0">
                     <form class="d-flex">
@@ -141,7 +141,7 @@
 
 
     <!-- Footer-->
-    <footer class="py-5 bg-dark">
+    <footer class="py-5 bg-secondary">
         <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Tienda ASP .NET</p></div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

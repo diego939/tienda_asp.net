@@ -8,6 +8,12 @@
 
             <!-- 🛒 LISTA PRODUCTOS -->
             <div class="col-lg-8">
+                <div class="card mb-3 border-0 border-bottom">
+                    <div class="card-body d-flex justify-content-between">
+                        <h4 class="mt-2">Mi carrito</h4>
+                        <button class="btn btn-outline-dark bg-gradient rounded-pill" onclick="window.location.href='@Url.Action("Index", "Tienda")'"> <i class="bi bi-cart-plus"></i> Seguir comprando</button>
+                    </div>
+                </div>
                 <div id="contenedorProductos"></div>
             </div>
 
@@ -29,7 +35,7 @@
                             <strong>$<span id="totalGeneral">0</span></strong>
                         </div>
 
-                        <button class="btn btn-dark w-100">
+                        <button class="btn btn-success btn-lg bg-gradient w-100">
                             Finalizar Compra
                         </button>
                     </div>
@@ -53,8 +59,6 @@
                 url: '@Url.Action("ListarCarrito", "Tienda")',
                 type: "GET",
                 success: function(response){
-                        console.log("Response completo:", response);
-        console.log("Data:", response.data);
 
                     $("#contenedorProductos").empty();
 
@@ -123,7 +127,9 @@
                                         <!-- Total -->
                                         <div class="col-md-2 col-6 mt-3 mt-md-0 text-md-center">
                                             <small class="text-muted">Subtotal</small>
-                                            <strong>$${item.total}</strong>
+                                            <div>
+                                                <strong>$${item.total}</strong>
+                                            </div>
                                         </div>
 
                                         <!-- Eliminar -->
