@@ -13,7 +13,7 @@
 
             <!-- 💰 RESUMEN -->
             <div class="col-lg-4">
-                <div class="card shadow-sm resumen-card">
+                <div class="card shadow-sm rounded-4">
                     <div class="card-body">
                         <h5 class="mb-4">Resumen de Compra</h5>
 
@@ -80,7 +80,7 @@
                         totalGeneral += item.total;
 
                         $("#contenedorProductos").append(`
-                            <div class="card mb-3 shadow-sm producto-card">
+                            <div class="card mb-3 shadow-sm rounded-4">
                                 <div class="card-body">
                                     <div class="row align-items-center">
 
@@ -100,7 +100,7 @@
 
                                         <!-- Cantidad -->
                                         <div class="col-md-3 col-12 mt-3 mt-md-0">
-                                            <div class="input-group cantidad-group">
+                                            <div class="input-group mx-auto" style="max-width: 120px;">
 
                                                 <button class="btn btn-outline-dark"
                                                     onclick="modificarCantidad(${item.idProducto}, -1)">
@@ -226,25 +226,3 @@
 
 	</script>
 }
-
-<style>
-    .producto-card {
-        border-radius: 12px;
-        border: none;
-    }
-
-    .resumen-card {
-        border-radius: 15px;
-        border: none;
-        position: sticky;
-        top: 20px;
-    }
-
-    .cantidad-group button {
-        width: 40px;
-    }
-
-    .cantidad-group input {
-        max-width: 60px;
-    }
-</style>
