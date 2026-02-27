@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using CapaDatos;
 using CapaEntidad;
 using CapaNegocio;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CapaPresentacionTienda.Controllers
 {
@@ -222,6 +223,63 @@ namespace CapaPresentacionTienda.Controllers
 			cantidad = new CN_Carrito().CantidadEnCarrito(idCliente);
 
 			return Json(new { cantidad = cantidad });
+		}
+
+		[HttpGet]
+		public JsonResult ListarPais()
+		{
+			var lista = new CN_Ubicacion().ListarPais();
+			return Json(new { data = lista });
+		}
+
+		[HttpPost]
+		public JsonResult ListarProvincia(int idPais)
+		{
+			var lista = new CN_Ubicacion().ListarProvincia(idPais);
+			return Json(new { data = lista });
+		}
+
+		[HttpPost]
+		public JsonResult ListarDepartamento(int idProvincia)
+		{
+			var lista = new CN_Ubicacion().ListarDepartamento(idProvincia);
+			return Json(new { data = lista });
+		}
+
+		[HttpPost]
+		public JsonResult ConcretarVenta(string contacto, string telefono,
+								  string direccion, int idDepartamento)
+		{
+			string mensaje = string.Empty;
+
+			int idCliente = int.Parse(User.FindFirst("id").Value);
+
+			var carrito = new CN_Carrito().Listar(idCliente);
+
+			if (carrito.Count == 0)
+				return Json(new { respuesta = false, mensaje = "Carrito vacío" });
+
+			Venta oVenta = new Venta()
+			{
+				oCliente = new Cliente() { id = idCliente },
+				contacto = contacto,
+				telefono = telefono,
+				direccion = direccion,
+				oDepartamento = new Departamento() { id = idDepartamento },
+				id_transaccion = Guid.NewGuid().ToString(),
+				total_productos = carrito.Sum(x => x.cantidad),
+				monto_total = carrito.Sum(x => x.cantidad * x.oProducto.precio),
+				oDetalleVenta = carrito.Select(c => new DetalleVenta()
+				{
+					oProducto = new Producto() { id = c.oProducto.id },
+					cantidad = c.cantidad,
+					total = c.cantidad * c.oProducto.precio
+				}).ToList()
+			};
+
+			int resultado = new CN_venta().Registrar(oVenta, out mensaje);
+
+			return Json(new { respuesta = resultado > 0, mensaje = mensaje });
 		}
 
 	}

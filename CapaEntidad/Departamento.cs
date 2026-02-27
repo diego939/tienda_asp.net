@@ -16,7 +16,8 @@ namespace CapaEntidad
 	*/
     public class Departamento
     {
-		public string id { get; set; }
+		public int id { get; set; }
 		public string descripcion { get; set; }
+		public Provincia oProvincia { get; set; }
 	}
 }
