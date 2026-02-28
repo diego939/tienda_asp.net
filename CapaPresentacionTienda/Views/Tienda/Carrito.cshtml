@@ -216,7 +216,7 @@
                                             <div class="input-group mx-auto" style="max-width: 120px;">
 
                                                 <button class="btn btn-outline-dark"
-                                                    onclick="modificarCantidad(${item.idProducto}, -1)"
+                                                    onclick="modificarCantidad(${item.idProducto}, -1, this)"
                                                      ${item.cantidad === 1 ? 'disabled' : ''}>
                                                     -
                                                 </button>
@@ -227,7 +227,7 @@
                                                        readonly>
 
                                                 <button class="btn btn-outline-dark"
-                                                    onclick="modificarCantidad(${item.idProducto}, 1)">
+                                                    onclick="modificarCantidad(${item.idProducto}, 1, this)">
                                                     +
                                                 </button>
 
@@ -262,12 +262,21 @@
             });
         }
 
-        function modificarCantidad(idProducto, cambio){
+        function modificarCantidad(idProducto, cambio, btn){
 
             if(!idProducto) return;
 
+            let contenedor = $(btn).closest(".input-group");
+
+            // 🔒 Deshabilitar ambos botones
+            contenedor.find("button").prop("disabled", true);
+
+            // ⏳ Mostrar loading sobre el input-group
+            contenedor.LoadingOverlay("show");
+
             agregarCarrito(idProducto, cambio);
 
+            // Esperamos que termine el ajax y luego recargamos carrito
             setTimeout(function(){
                 cargarCarrito();
             }, 300);
