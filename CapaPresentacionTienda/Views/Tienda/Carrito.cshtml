@@ -74,6 +74,12 @@
 @section scripts {
 	<script>
          $(document).ready(function () {
+            //Llamo a LoadingOverlay una sola vez cuando cargo 
+            $("#contenedorProductos").LoadingOverlay("show");
+            //Desaparece el LoadingOverlay luego de medio segundo
+            setTimeout(function () {
+                $("#contenedorProductos").LoadingOverlay("hide");
+            }, 500);
 
             cargarCarrito();
             cargarPais();
