@@ -216,7 +216,8 @@
                                             <div class="input-group mx-auto" style="max-width: 120px;">
 
                                                 <button class="btn btn-outline-dark"
-                                                    onclick="modificarCantidad(${item.idProducto}, -1)">
+                                                    onclick="modificarCantidad(${item.idProducto}, -1)"
+                                                     ${item.cantidad === 1 ? 'disabled' : ''}>
                                                     -
                                                 </button>
 
