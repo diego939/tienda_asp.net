@@ -11,10 +11,9 @@ public class Venta
 	public string contacto { get; set; }
 	public string telefono { get; set; }
 	public string direccion { get; set; }
-
 	public Departamento oDepartamento { get; set; }
-
 	public string id_transaccion { get; set; }
+	public string estado { get; set; } // Pendiente, Aprobado, Rechazado
 	public DateTime fecha_registro { get; set; }
 
 	public List<DetalleVenta> oDetalleVenta { get; set; }
