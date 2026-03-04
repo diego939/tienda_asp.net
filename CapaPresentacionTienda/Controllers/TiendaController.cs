@@ -245,10 +245,9 @@ namespace CapaPresentacionTienda.Controllers
 			var lista = new CN_Ubicacion().ListarDepartamento(idProvincia);
 			return Json(new { data = lista });
 		}
-
 		[HttpPost]
 		public JsonResult ConcretarVenta(string contacto, string telefono,
-								  string direccion, int idDepartamento)
+								 string direccion, int idDepartamento)
 		{
 			string mensaje = string.Empty;
 
@@ -257,7 +256,9 @@ namespace CapaPresentacionTienda.Controllers
 			var carrito = new CN_Carrito().Listar(idCliente);
 
 			if (carrito.Count == 0)
-				return Json(new { respuesta = false, mensaje = "Carrito vacío" });
+				return Json(new { status = false, mensaje = "Carrito vacío" });
+
+			string idTransaccion = Guid.NewGuid().ToString();
 
 			Venta oVenta = new Venta()
 			{
@@ -266,7 +267,7 @@ namespace CapaPresentacionTienda.Controllers
 				telefono = telefono,
 				direccion = direccion,
 				oDepartamento = new Departamento() { id = idDepartamento },
-				id_transaccion = Guid.NewGuid().ToString(),
+				id_transaccion = idTransaccion,
 				total_productos = carrito.Sum(x => x.cantidad),
 				monto_total = carrito.Sum(x => x.cantidad * x.oProducto.precio),
 				oDetalleVenta = carrito.Select(c => new DetalleVenta()
@@ -279,7 +280,24 @@ namespace CapaPresentacionTienda.Controllers
 
 			int resultado = new CN_venta().Registrar(oVenta, out mensaje);
 
-			return Json(new { respuesta = resultado > 0, mensaje = mensaje });
+			if (resultado == 0)
+				return Json(new { status = false, mensaje = mensaje });
+
+
+			return Json(new
+			{
+				status = true,
+				link = Url.Action("PagoEfectuado", "Tienda",
+					new { id_transaccion = idTransaccion, status = true })
+			});
+		}
+
+		public ActionResult PagoEfectuado(string id_transaccion, bool status)
+		{
+			ViewData["Status"] = status;
+			ViewData["id_transaccion"] = id_transaccion;
+
+			return View();
 		}
 
 	}

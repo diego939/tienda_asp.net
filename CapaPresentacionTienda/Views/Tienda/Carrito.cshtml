@@ -370,18 +370,21 @@
             Swal.fire({
                 title: 'Confirmar compra',
                 text: "¿Desea confirmar la compra?",
-                icon: 'info', // obligatorio para que dibuje el contenedor
+                icon: 'info',
                 iconHtml: '<i class="bi bi-bag-check-fill" style="font-size:40px;color:#198754;"></i>',
                 showCancelButton: true,
                 confirmButtonText: 'Sí, comprar',
                 cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#198754',   // color botón confirmar
-                cancelButtonColor: '#dc3545'      // color botón cancelar
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#dc3545'
             }).then((result) => {
 
                 if (!result.isConfirmed) return;
 
-                $("#btnFinalizar").prop("disabled", true).text("Procesando...");
+                let btn = $("#btnFinalizar");
+
+                btn.prop("disabled", true)
+                   .html('<span class="spinner-border spinner-border-sm"></span> Procesando...');
 
                 $.ajax({
                     url: '@Url.Action("ConcretarVenta", "Tienda")',
@@ -394,27 +397,33 @@
                     },
                     success: function (response) {
 
-                        if (response.respuesta) {
+                        if (response.status) {
+
+                            // 🔥 Redirige a PagoEfectuado
+                            window.location.href = response.link;
+
+                        } else {
 
                             Swal.fire({
-                                icon: 'success',
-                                title: 'Venta realizada correctamente',
-                                confirmButtonText: 'OK'
+                                icon: 'error',
+                                title: 'Error',
+                                text: response.mensaje
                             });
-                            actualizarContador(0);
-                            cargarCarrito();
 
-                            // Reset formulario
-                            $("#cboPais").val("");
-                            $("#cboProvincia").prop("disabled", true).html('<option>Seleccione</option>');
-                            $("#cboDepartamento").prop("disabled", true).html('<option>Seleccione</option>');
-                            $("#txtDireccion").val("");
+                            btn.prop("disabled", false)
+                               .text("Finalizar Compra");
                         }
-                        else {
-                            Swal.fire("Error", response.mensaje, "error");
-                        }
+                    },
+                    error: function () {
 
-                        $("#btnFinalizar").prop("disabled", false).text("Finalizar Compra");
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error inesperado',
+                            text: 'Ocurrió un problema al procesar la compra.'
+                        });
+
+                        btn.prop("disabled", false)
+                           .text("Finalizar Compra");
                     }
                 });
 
