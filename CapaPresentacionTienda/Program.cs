@@ -1,8 +1,9 @@
 using CapaDatos;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
+using CapaNegocio.Servicios;
 //AUTENTICACION METHODS -----------------------------------------------------------------------------------------
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 //AUTENTICACION METHODS -----------------------------------------------------------------------------------------
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +15,9 @@ Conexion.SetCadenaConexion(
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+// 🔵 Registrar PayPalService (AQUÍ)
+builder.Services.AddScoped<PayPalService>();
 
 //AUTENTICACION METHODS -----------------------------------------------------------------------------------------
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
