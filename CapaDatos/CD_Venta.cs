@@ -24,9 +24,9 @@ namespace CapaDatos
 						{
 							SqlCommand cmdVenta = new SqlCommand(@"
                                 INSERT INTO venta
-                                (id_cliente,total_productos,monto_total,contacto,telefono,direccion,id_departamento,id_transaccion)
+                                (id_cliente,total_productos,monto_total,contacto,telefono,direccion,id_departamento,id_transaccion, estado)
                                 VALUES
-                                (@id_cliente,@total_productos,@monto_total,@contacto,@telefono,@direccion,@id_departamento,@id_transaccion);
+                                (@id_cliente,@total_productos,@monto_total,@contacto,@telefono,@direccion,@id_departamento,@id_transaccion,@estado);
                                 SELECT SCOPE_IDENTITY();", oconexion, tr);
 
 							cmdVenta.CommandType = CommandType.Text;
@@ -39,6 +39,7 @@ namespace CapaDatos
 							cmdVenta.Parameters.AddWithValue("@direccion", obj.direccion);
 							cmdVenta.Parameters.AddWithValue("@id_departamento", obj.oDepartamento.id);
 							cmdVenta.Parameters.AddWithValue("@id_transaccion", obj.id_transaccion);
+							cmdVenta.Parameters.AddWithValue("@estado", obj.estado);
 
 							idVentaGenerada = Convert.ToInt32(cmdVenta.ExecuteScalar());
 
