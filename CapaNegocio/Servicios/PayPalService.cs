@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using CapaEntidad;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 
@@ -61,14 +62,14 @@ namespace CapaNegocio.Servicios
 					intent = "CAPTURE",
 					purchase_units = new[]
 					{
-						new {
-							amount = new {
-								currency_code = "USD",
-								value = total.ToString("F2",
-									System.Globalization.CultureInfo.InvariantCulture)
-							}
-						}
+				new {
+					amount = new {
+						currency_code = "USD",
+						value = total.ToString("F2",
+							System.Globalization.CultureInfo.InvariantCulture)
 					}
+				}
+			}
 				};
 
 				var content = new StringContent(
@@ -81,13 +82,22 @@ namespace CapaNegocio.Servicios
 					content);
 
 				var json = await response.Content.ReadAsStringAsync();
+
+				Console.WriteLine("PAYPAL RESPONSE:");
+				Console.WriteLine(json);
+
 				var data = JObject.Parse(json);
+
+				if (!response.IsSuccessStatusCode)
+				{
+					throw new Exception("Error creando orden PayPal: " + json);
+				}
 
 				return data["id"]?.ToString();
 			}
 		}
 
-		public async Task<bool> CaptureOrder(string orderId)
+		public async Task<PayPalCaptureResult> CaptureOrder(string orderId)
 		{
 			var accessToken = await GetAccessToken();
 
@@ -96,14 +106,31 @@ namespace CapaNegocio.Servicios
 				client.DefaultRequestHeaders.Authorization =
 					new AuthenticationHeaderValue("Bearer", accessToken);
 
+				var content = new StringContent("{}", Encoding.UTF8, "application/json");
+
 				var response = await client.PostAsync(
 					$"{_baseUrl}/v2/checkout/orders/{orderId}/capture",
-					null);
+					content);
 
 				var json = await response.Content.ReadAsStringAsync();
+
+				if (!response.IsSuccessStatusCode)
+					throw new Exception($"PayPal error: {response.StatusCode} - {json}");
+
 				var data = JObject.Parse(json);
 
-				return data["status"]?.ToString() == "COMPLETED";
+				var status = data["status"]?.ToString();
+
+				if (status != "COMPLETED")
+					return null;
+
+				var captureId = data["purchase_units"][0]["payments"]["captures"][0]["id"].ToString();
+
+				return new PayPalCaptureResult
+				{
+					CaptureId = captureId,
+					Status = status
+				};
 			}
 		}
 	}
