@@ -3,21 +3,30 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 
 namespace CapaNegocio.Servicios
 {
 	public class PayPalService
 	{
-		private readonly string _clientId = "AX8faMOFubeVAqiDK_4kG_2gE8Xm7Fi4bLPnjOoHSwzzYejEXvGgzBjuJ-_oHxkavuhjp5YO9iBJKIHM";
-		private readonly string _secret = "EKOcE80XeHU82ekFWOxXz9DVuZ0TYB3ZHWLO4I890drHy0yPPXQAnP4cWJTUhhHxF9Kwnfa4d-yo2Skt";
-		private readonly string _baseUrl = "https://api-m.sandbox.paypal.com";
+		private readonly string _clientId;
+		private readonly string _secret;
+		private readonly string _baseUrl;
+
+		public PayPalService(IConfiguration configuration)
+		{
+			_clientId = configuration["PayPal:ClientId"];
+			_secret = configuration["PayPal:Secret"];
+			_baseUrl = configuration["PayPal:BaseUrl"];
+		}
 
 		private async Task<string> GetAccessToken()
 		{
 			using (var client = new HttpClient())
 			{
 				var byteArray = Encoding.ASCII.GetBytes($"{_clientId}:{_secret}");
+
 				client.DefaultRequestHeaders.Authorization =
 					new AuthenticationHeaderValue("Basic",
 						Convert.ToBase64String(byteArray));
