@@ -1,6 +1,7 @@
 ﻿using CapaDatos;
 using CapaEntidad;
 using CapaNegocio;
+using CapaNegocio.Servicios;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +10,14 @@ namespace CapaPresentacionTienda.Controllers
 	[ResponseCache(NoStore = true, Location = ResponseCacheLocation.None)]
 	public class TiendaController : Controller
 	{
+		private readonly PayPalService _payPalService;
 		// GET: TiendaController
+
+		public TiendaController(PayPalService payPalService)
+		{
+			_payPalService = payPalService;
+		}
+
 		public ActionResult Index()
 		{
 			return View();
@@ -245,31 +253,56 @@ namespace CapaPresentacionTienda.Controllers
 			var lista = new CN_Ubicacion().ListarDepartamento(idProvincia);
 			return Json(new { data = lista });
 		}
+
 		[HttpPost]
-		public JsonResult ConcretarVenta(string contacto, string telefono,
-								 string direccion, int idDepartamento)
+		public async Task<IActionResult> CrearOrdenPaypal([FromBody] CrearOrdenRequest request)
 		{
-			string mensaje = string.Empty;
+			decimal total = request.Total;
+
+			var ordenId = await _payPalService.CreateOrder(total);
+
+			if (string.IsNullOrEmpty(ordenId))
+			{
+				return Json(new
+				{
+					status = false,
+					mensaje = "PayPal no devolvió un ID de orden"
+				});
+			}
+
+			return Json(new
+			{
+				status = true,
+				id = ordenId
+			});
+		}
+
+		[HttpPost]
+		public async Task<JsonResult> CapturarPaypal([FromBody] CapturarOrdenRequest request)
+		{
+			var pago = await _payPalService.CaptureOrder(request.orderId);
+
+			if (pago == null)
+				return Json(new { status = false, mensaje = "Pago no aprobado" });
 
 			int idCliente = int.Parse(User.FindFirst("id").Value);
 
 			var carrito = new CN_Carrito().Listar(idCliente);
 
-			if (carrito.Count == 0)
-				return Json(new { status = false, mensaje = "Carrito vacío" });
-
-			string idTransaccion = Guid.NewGuid().ToString();
-
 			Venta oVenta = new Venta()
 			{
 				oCliente = new Cliente() { id = idCliente },
-				contacto = contacto,
-				telefono = telefono,
-				direccion = direccion,
-				oDepartamento = new Departamento() { id = idDepartamento },
-				id_transaccion = idTransaccion,
+				contacto = request.contacto,
+				telefono = request.telefono,
+				direccion = request.direccion,
+				oDepartamento = new Departamento() { id = request.idDepartamento },
+
+				id_transaccion = pago.CaptureId, // ID real de PayPal
+				estado = pago.Status,            // Estado real de PayPal
+
 				total_productos = carrito.Sum(x => x.cantidad),
 				monto_total = carrito.Sum(x => x.cantidad * x.oProducto.precio),
+
 				oDetalleVenta = carrito.Select(c => new DetalleVenta()
 				{
 					oProducto = new Producto() { id = c.oProducto.id },
@@ -278,17 +311,17 @@ namespace CapaPresentacionTienda.Controllers
 				}).ToList()
 			};
 
+			string mensaje;
 			int resultado = new CN_venta().Registrar(oVenta, out mensaje);
 
 			if (resultado == 0)
 				return Json(new { status = false, mensaje = mensaje });
 
-
 			return Json(new
 			{
 				status = true,
 				link = Url.Action("PagoEfectuado", "Tienda",
-					new { id_transaccion = idTransaccion, status = true })
+				new { id_transaccion = pago.CaptureId, status = true })
 			});
 		}
 
