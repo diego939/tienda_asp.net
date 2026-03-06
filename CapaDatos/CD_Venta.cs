@@ -111,10 +111,10 @@ namespace CapaDatos
 			using (SqlConnection con = new SqlConnection(Conexion.cn))
 			{
 				string query = @"
-        select id,id_transaccion,total_productos,
-        monto_total,fecha_registro
-        from venta
-        where id_cliente = @idCliente";
+								select id,id_transaccion,total_productos,
+								monto_total,fecha_registro
+								from venta
+								where id_cliente = @idCliente";
 
 				SqlCommand cmd = new SqlCommand(query, con);
 				cmd.Parameters.AddWithValue("@idCliente", idCliente);
@@ -147,10 +147,10 @@ namespace CapaDatos
 			using (SqlConnection con = new SqlConnection(Conexion.cn))
 			{
 				string query = @"
-        select p.nombre,dv.cantidad,dv.total
-        from detalle_venta dv
-        inner join producto p on p.id = dv.id_producto
-        where dv.id_venta = @idVenta";
+								select p.nombre,dv.cantidad,dv.total
+								from detalle_venta dv
+								inner join producto p on p.id = dv.id_producto
+								where dv.id_venta = @idVenta";
 
 				SqlCommand cmd = new SqlCommand(query, con);
 				cmd.Parameters.AddWithValue("@idVenta", idVenta);

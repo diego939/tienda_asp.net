@@ -29,30 +29,40 @@
 <!-- Modal para mostrar el detalle de la compra -->
 <div class="modal fade" id="modalDetalle">
 
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-md">
         <div class="modal-content">
 
             <div class="modal-header">
-                <h5>Detalle de compra</h5>
+                <h5 class="text-center fw-bold" id="idVenta"></h5>
                 <button class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
             <div class="modal-body">
 
-                <table class="table">
+                <div class="d-flex justify-content-between">
+                    <div class="me-2 fw-semibold">Transacción: </div>
+                    <div class="text-break text-secondary" id="transaccionVenta"></div>
+                </div>
 
-                    <thead>
-                        <tr>
-                            <th>Producto</th>
-                            <th>Cantidad</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
+                <div class="d-flex justify-content-between">
+                    <div class="me-2 fw-semibold">Fecha: </div>
+                    <div class="text-secondary" id="fechaVenta"></div>
+                </div>
 
-                    <tbody id="tablaDetalle"></tbody>
+                <!-- Encabezado -->
+                <div class="d-flex fw-bold border-bottom pb-2 mb-2 mt-4" style="border-bottom:1px dotted #ccc;">
+                    <div style="flex:2">Producto</div>
+                    <div style="flex:1">Cantidad</div>
+                    <div style="flex:1">Total</div>
+                </div>
 
-                </table>
+                <!-- Contenedor de productos -->
+                <div id="tablaDetalle"></div>
 
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <span class="fw-bold">Total de la compra</span>
+                <span class="fw-bold text-success">$ <span id="totalVenta"></span></span>
             </div>
 
         </div>
@@ -85,20 +95,40 @@
                     data: 'fecha_registro',
                     render: function(data){
                         let fecha = new Date(data);
-                        return fecha.toLocaleDateString();
+                        return fecha.toLocaleString('es-AR', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false
+                        });
                     }
                 },
                 {
-                    data: "id",
-                    render: function(data){
-                        return `
-                            <button class="btn btn-primary btn-sm verDetalle"
-                            data-id="${data}">
-                            Ver detalle
-                            </button>
-                        `;
-                    }
+                data: null,
+                render: function(data){
+
+                            let fecha = new Date(data.fecha_registro).toLocaleString('es-AR', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false
+                            });
+
+                    return `
+                        <button class="btn btn-outline-dark btn-sm verDetalle"
+                            data-id="${data.id}"
+                            data-transaccion="${data.id_transaccion}"
+                            data-total="${data.monto_total}"
+                            data-fecha="${fecha}">
+                            <i class="bi bi-eye"></i> Detalle
+                        </button>
+                    `;
                 }
+        }
             ],
             language: {
                 url: "https://cdn.datatables.net/plug-ins/2.3.6/i18n/es-ES.json"
@@ -109,6 +139,16 @@
         $("#tablaCompras tbody").on("click", ".verDetalle", function () {
 
             let idVenta = $(this).data("id");
+            let transaccion = $(this).data("transaccion");
+            let total = $(this).data("total");
+            let fecha = $(this).data("fecha");
+
+            //Mostramos info de la venta en el modal
+            $("#idVenta").text("N° de venta: #" + idVenta);
+            $("#transaccionVenta").text(transaccion);
+            $("#modalDetalle #totalVenta").text(total);
+            $("#fechaVenta").text(fecha);
+
 
             $.get("/Tienda/ObtenerDetalleVenta?idVenta=" + idVenta, function (response) {
 
@@ -117,11 +157,11 @@
                 response.data.forEach(function (item) {
 
                     $("#tablaDetalle").append(`
-                        <tr>
-                            <td>${item.oProducto.nombre}</td>
-                            <td>${item.cantidad}</td>
-                            <td>$ ${item.total}</td>
-                        </tr>
+                        <div class="d-flex border-bottom py-2 text-secondary" style="border-bottom:1px dotted #ccc;">
+                            <div style="flex:2">${item.oProducto.nombre}</div>
+                            <div style="flex:1">x ${item.cantidad}</div>
+                            <div style="flex:1">$ ${item.total}</div>
+                        </div>
                     `);
 
                 });
