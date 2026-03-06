@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -48,7 +49,7 @@ namespace CapaNegocio.Servicios
 			}
 		}
 
-		public async Task<string> CreateOrder(decimal total)
+		public async Task<string> CreateOrder(decimal total, List<object> items)
 		{
 			var accessToken = await GetAccessToken();
 
@@ -57,17 +58,28 @@ namespace CapaNegocio.Servicios
 				client.DefaultRequestHeaders.Authorization =
 					new AuthenticationHeaderValue("Bearer", accessToken);
 
+				// Creamos la orden con purchase_units y detalle de items
 				var order = new
 				{
 					intent = "CAPTURE",
 					purchase_units = new[]
 					{
-				new {
-					amount = new {
+				new
+				{
+					amount = new
+					{
 						currency_code = "USD",
-						value = total.ToString("F2",
-							System.Globalization.CultureInfo.InvariantCulture)
-					}
+						value = total.ToString("F2", System.Globalization.CultureInfo.InvariantCulture),
+						breakdown = new
+						{
+							item_total = new
+							{
+								currency_code = "USD",
+								value = total.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
+							}
+						}
+					},
+					items = items
 				}
 			}
 				};
@@ -77,10 +89,7 @@ namespace CapaNegocio.Servicios
 					Encoding.UTF8,
 					"application/json");
 
-				var response = await client.PostAsync(
-					$"{_baseUrl}/v2/checkout/orders",
-					content);
-
+				var response = await client.PostAsync($"{_baseUrl}/v2/checkout/orders", content);
 				var json = await response.Content.ReadAsStringAsync();
 
 				Console.WriteLine("PAYPAL RESPONSE:");

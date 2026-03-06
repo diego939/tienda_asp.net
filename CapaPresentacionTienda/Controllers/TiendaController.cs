@@ -257,17 +257,37 @@ namespace CapaPresentacionTienda.Controllers
 		[HttpPost]
 		public async Task<IActionResult> CrearOrdenPaypal([FromBody] CrearOrdenRequest request)
 		{
-			decimal total = request.Total;
+			int idCliente = int.Parse(User.FindFirst("id").Value);
 
-			var ordenId = await _payPalService.CreateOrder(total);
+			// Traer carrito completo
+			var carrito = new CN_Carrito().Listar(idCliente);
+
+			if (carrito == null || carrito.Count == 0)
+			{
+				return Json(new { status = false, mensaje = "El carrito está vacío" });
+			}
+
+			// Mapear items para PayPal para que arme el detalle de la orden (evitamos diferencias con el total)
+			var items = carrito.Select(c => new PayPalItem
+			{
+				name = c.oProducto.nombre,
+				unit_amount = new PayPalAmount
+				{
+					currency_code = "USD",
+					value = c.oProducto.precio.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)
+				},
+				quantity = c.cantidad.ToString()
+			}).Cast<object>().ToList();
+
+			// Total calculado desde carrito (evitamos diferencias)
+			var itemTotal = carrito.Sum(c => c.oProducto.precio * c.cantidad);
+
+			// Llamada al servicio con items y total
+			var ordenId = await _payPalService.CreateOrder(itemTotal, items);
 
 			if (string.IsNullOrEmpty(ordenId))
 			{
-				return Json(new
-				{
-					status = false,
-					mensaje = "PayPal no devolvió un ID de orden"
-				});
+				return Json(new { status = false, mensaje = "PayPal no devolvió un ID de orden" });
 			}
 
 			return Json(new
