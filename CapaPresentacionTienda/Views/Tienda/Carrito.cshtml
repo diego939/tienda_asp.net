@@ -26,16 +26,19 @@
                         <div class="mb-3">
                             <label>País</label>
                             <select id="cboPais" class="form-select"></select>
+                            <div class="invalid-feedback" id="errorPais"></div>
                         </div>
 
                         <div class="mb-3">
                             <label>Provincia</label>
                             <select id="cboProvincia" class="form-select" disabled></select>
+                            <div class="invalid-feedback" id="errorPorvincia"></div>
                         </div>
 
                         <div class="mb-3">
                             <label>Departamento</label>
                             <select id="cboDepartamento" class="form-select" disabled></select>
+                            <div class="invalid-feedback" id="errorDepartamento"></div>
                         </div>
 
                         <div class="mb-3">
@@ -44,11 +47,13 @@
                                    id="txtTelefono"
                                    class="form-control"
                                    placeholder="Ej: 11 2345 6789">
+                            <div class="invalid-feedback" id="errorTelefono"></div>
                         </div>
 
                         <div class="mb-3">
                             <label>Dirección</label>
                             <input type="text" id="txtDireccion" class="form-control" placeholder="Calle, número, referencia">
+                            <div class="invalid-feedback" id="errorDireccion"></div>
                         </div>
 
                         <hr />
@@ -159,11 +164,36 @@
                 .then(res => res.json())
                 .then(response => {
 
-                    if (response.status) {
-                        window.location.href = response.link;
-                    } else {
-                        Swal.fire("Error", response.mensaje, "error");
-                    }
+                if (response.status) {
+
+                    Swal.fire({
+                        title: "¡Pago realizado!",
+                        html: `
+                            <p>Tu pago fue procesado correctamente.</p>
+                            <strong>ID de transacción:</strong><br>
+                            <span style="color:#0d6efd">${response.idTransaccion}</span>
+                        `,
+                        icon: "success",
+                        iconHtml: '<i class="bi bi-bag-check" style="font-size: 3rem; "></i>',
+                        showConfirmButton: true,
+                        confirmButtonText: "🛒 Ir a la tienda",
+                        confirmButtonColor: "#273FF5",      // verde = success
+                        allowOutsideClick: false,           // no se cierra al click fuera
+                        showCancelButton: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // redirige a la tienda
+                            window.location.href = '@Url.Action("Index", "Tienda")';
+                        }
+                    });
+            
+            // opcional: limpiar carrito
+            cargarCarrito();
+            actualizarContador(0);
+
+        } else {
+            Swal.fire("Error", response.mensaje, "error");
+        }
 
                 });
             }
@@ -404,48 +434,80 @@
 
         function validarFormulario(mostrarError = false) {
 
-            let pais = $("#cboPais").val();
-            let provincia = $("#cboProvincia").val();
-            let departamento = $("#cboDepartamento").val();
-            let direccion = $("#txtDireccion").val().trim();
-            let telefono = $("#txtTelefono").val().trim();
+            let pais = $("#cboPais");
+            let provincia = $("#cboProvincia");
+            let departamento = $("#cboDepartamento");
+            let direccion = $("#txtDireccion");
+            let telefono = $("#txtTelefono");
+
             let total = parseFloat($("#totalGeneral").text());
 
-            let telefonoValido = /^[0-9+\-\s()]{6,20}$/.test(telefono);
+            let telefonoValido = /^[0-9+\-\s()]{6,20}$/.test(telefono.val().trim());
 
-            if (total <= 0 && mostrarError) {
-                Swal.fire("Carrito vacío", "Agregue productos antes de pagar", "warning");
+            let valido = true;
+            let mensaje = "";
+
+            $(".is-invalid").removeClass("is-invalid");
+            $(".invalid-feedback").text("");
+
+            // única alerta
+            if (total <= 0) {
+                if (mostrarError) {
+                            Swal.fire({
+                                icon: "warning",
+                                iconHtml: '<i class="bi bi-cart-x" style="font-size: 3rem;"></i>',
+                                title: "Carrito vacío",
+                                text: "Agregue productos antes de pagar",
+                                confirmButtonText: "🛒 Ver productos",
+                                showCancelButton: true,
+                                cancelButtonText: "Cancelar",
+                                confirmButtonColor: "#dc3545",   // rojo = danger
+                                cancelButtonColor: "#198754"     // verde = success
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = '@Url.Action("Index", "Tienda")';
+                                }
+                            });
+                }
                 return false;
             }
 
-            if (!pais && mostrarError) {
-                Swal.fire("Falta información", "Seleccione un país", "warning");
-                return false;
+            if (!pais.val()) {
+                mensaje = "Debe seleccionar un país";
+                pais.addClass("is-invalid");
+                $("#errorPais").text(mensaje);
+                valido = false;
             }
 
-            if (!provincia && mostrarError) {
-                Swal.fire("Falta información", "Seleccione una provincia", "warning");
-                return false;
+            if (!provincia.val()) {
+                mensaje = "Debe seleccionar una provincia";
+                provincia.addClass("is-invalid");
+                $("#errorProvincia").text(mensaje);
+                valido = false;
             }
 
-            if (!departamento && mostrarError) {
-                Swal.fire("Falta información", "Seleccione un departamento", "warning");
-                return false;
+            if (!departamento.val()) {
+                mensaje = "Debe seleccionar un departamento";
+                departamento.addClass("is-invalid");
+                $("#errorDepartamento").text(mensaje);
+                valido = false;
             }
 
-            if (!telefonoValido && mostrarError) {
-                Swal.fire("Teléfono inválido", "Ingrese un teléfono válido", "warning");
-                return false;
+            if (!telefonoValido) {
+                mensaje = "Ingrese un teléfono válido";
+                telefono.addClass("is-invalid");
+                $("#errorTelefono").text(mensaje);
+                valido = false;
             }
 
-            if (!direccion && mostrarError) {
-                Swal.fire("Falta información", "Ingrese la dirección", "warning");
-                return false;
+            if (!direccion.val().trim()) {
+                mensaje = "Debe ingresar la dirección";
+                direccion.addClass("is-invalid");
+                $("#errorDireccion").text(mensaje);
+                valido = false;
             }
 
-            return pais && provincia && departamento && direccion && telefonoValido && total > 0;
+            return valido;
         }
-
-  
 	</script>
 }

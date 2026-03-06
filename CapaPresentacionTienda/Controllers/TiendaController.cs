@@ -320,17 +320,8 @@ namespace CapaPresentacionTienda.Controllers
 			return Json(new
 			{
 				status = true,
-				link = Url.Action("PagoEfectuado", "Tienda",
-				new { id_transaccion = pago.CaptureId, status = true })
+				idTransaccion = pago.CaptureId
 			});
-		}
-
-		public ActionResult PagoEfectuado(string id_transaccion, bool status)
-		{
-			ViewData["Status"] = status;
-			ViewData["id_transaccion"] = id_transaccion;
-
-			return View();
 		}
 
 	}
