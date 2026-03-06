@@ -344,5 +344,29 @@ namespace CapaPresentacionTienda.Controllers
 			});
 		}
 
+		public IActionResult MisCompras()
+		{
+
+			return View();
+		}
+
+		[HttpGet]
+		public JsonResult ListarMisCompras()
+		{
+			int idCliente = int.Parse(User.FindFirst("id").Value);
+
+			List<Venta> lista = new CN_venta().ListarPorCliente(idCliente);
+
+			return Json(new { data = lista });
+		}
+
+		[HttpGet]
+		public JsonResult ObtenerDetalleVenta(int idVenta)
+		{
+			List<DetalleVenta> detalle = new CN_venta().DetalleVenta(idVenta);
+
+			return Json(new { data = detalle });
+		}
+
 	}
 }

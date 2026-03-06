@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
-using Microsoft.Data.SqlClient;
 using CapaEntidad;
+using Microsoft.Data.SqlClient;
 
 namespace CapaDatos
 {
@@ -101,6 +102,79 @@ namespace CapaDatos
 			}
 
 			return idVentaGenerada;
+		}
+
+		public List<Venta> ListarPorCliente(int idCliente)
+		{
+			List<Venta> lista = new List<Venta>();
+
+			using (SqlConnection con = new SqlConnection(Conexion.cn))
+			{
+				string query = @"
+        select id,id_transaccion,total_productos,
+        monto_total,fecha_registro
+        from venta
+        where id_cliente = @idCliente";
+
+				SqlCommand cmd = new SqlCommand(query, con);
+				cmd.Parameters.AddWithValue("@idCliente", idCliente);
+
+				con.Open();
+
+				using (SqlDataReader dr = cmd.ExecuteReader())
+				{
+					while (dr.Read())
+					{
+						lista.Add(new Venta()
+						{
+							id = Convert.ToInt32(dr["id"]),
+							id_transaccion = dr["id_transaccion"].ToString(),
+							total_productos = Convert.ToInt32(dr["total_productos"]),
+							monto_total = Convert.ToDecimal(dr["monto_total"]),
+							fecha_registro = Convert.ToDateTime(dr["fecha_registro"])
+						});
+					}
+				}
+			}
+
+			return lista;
+		}
+
+		public List<DetalleVenta> DetalleVenta(int idVenta)
+		{
+			List<DetalleVenta> lista = new List<DetalleVenta>();
+
+			using (SqlConnection con = new SqlConnection(Conexion.cn))
+			{
+				string query = @"
+        select p.nombre,dv.cantidad,dv.total
+        from detalle_venta dv
+        inner join producto p on p.id = dv.id_producto
+        where dv.id_venta = @idVenta";
+
+				SqlCommand cmd = new SqlCommand(query, con);
+				cmd.Parameters.AddWithValue("@idVenta", idVenta);
+
+				con.Open();
+
+				using (SqlDataReader dr = cmd.ExecuteReader())
+				{
+					while (dr.Read())
+					{
+						lista.Add(new DetalleVenta()
+						{
+							oProducto = new Producto()
+							{
+								nombre = dr["nombre"].ToString()
+							},
+							cantidad = Convert.ToInt32(dr["cantidad"]),
+							total = Convert.ToDecimal(dr["total"])
+						});
+					}
+				}
+			}
+
+			return lista;
 		}
 	}
 }

@@ -1,0 +1,135 @@
+﻿@model List<Venta>
+
+@{
+    ViewData["Title"] = "Mis Compras";
+}
+
+<div class="container mt-4">
+
+    <h4>Mis Compras</h4>
+
+    <table id="tablaCompras" class="table table-bordered">
+
+        <thead>
+            <tr>
+                <th>Transacción</th>
+                <th>Productos</th>
+                <th>Total</th>
+                <th>Fecha</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody></tbody>
+
+    </table>
+
+</div>
+
+<!-- Modal para mostrar el detalle de la compra -->
+<div class="modal fade" id="modalDetalle">
+
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <h5>Detalle de compra</h5>
+                <button class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+
+                <table class="table">
+
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="tablaDetalle"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+@section scripts{
+    <script>
+        let tablaCompras;
+        // Inicializar DataTable
+        tablaCompras = new DataTable('#tablaCompras', {
+            responsive: true,
+            ordering: false,
+            ajax: {
+                url: '@Url.Action("ListarMisCompras", "Tienda")',
+                type: "GET",
+                dataType: "json"
+            },
+            columns: [
+                { data: 'id_transaccion' },
+                { data: 'total_productos' },
+                {
+                    data: 'monto_total',
+                    render: function(data){
+                        return "$ " + data;
+                    }
+                },
+                {
+                    data: 'fecha_registro',
+                    render: function(data){
+                        let fecha = new Date(data);
+                        return fecha.toLocaleDateString();
+                    }
+                },
+                {
+                    data: "id",
+                    render: function(data){
+                        return `
+                            <button class="btn btn-primary btn-sm verDetalle"
+                            data-id="${data}">
+                            Ver detalle
+                            </button>
+                        `;
+                    }
+                }
+            ],
+            language: {
+                url: "https://cdn.datatables.net/plug-ins/2.3.6/i18n/es-ES.json"
+            }
+        });
+
+        // Evento para abrir el detalle
+        $("#tablaCompras tbody").on("click", ".verDetalle", function () {
+
+            let idVenta = $(this).data("id");
+
+            $.get("/Tienda/ObtenerDetalleVenta?idVenta=" + idVenta, function (response) {
+
+                $("#tablaDetalle").html("");
+
+                response.data.forEach(function (item) {
+
+                    $("#tablaDetalle").append(`
+                        <tr>
+                            <td>${item.oProducto.nombre}</td>
+                            <td>${item.cantidad}</td>
+                            <td>$ ${item.total}</td>
+                        </tr>
+                    `);
+
+                });
+
+                new bootstrap.Modal(document.getElementById("modalDetalle")).show();
+
+            });
+
+        });
+	</script>
+}
