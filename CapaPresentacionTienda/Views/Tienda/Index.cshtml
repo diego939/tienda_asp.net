@@ -6,120 +6,149 @@
     <div class="px-4 px-lg-5 my-5">
         <div class="text-center text-white">
             <h1 class="display-4 fw-bolder">Elevá tu estilo 🚀</h1>
-            <p class="lead fw-normal text-white-50 mb-0"> Descubrí productos únicos al mejor precio</p>
+            <p class="lead fw-normal text-white-50 mb-0">
+                Descubrí productos únicos al mejor precio
+            </p>
         </div>
     </div>
 </header>
-<!-- Section-->
+
 <section class="py-5">
     <div class="container-fluid px-4 px-lg-5 mt-5">
+
         <div class="row">
+
+            <!-- FILTROS -->
             <div class="col-sm-3">
+
                 <div class="row mb-4">
                     <div class="col-sm-12">
                         <div class="card">
+
                             <div class="card-header bg-dark text-white">
                                 Categorías
                             </div>
-                            <div class="card-body" id="contenedorCategoria">
 
-                            </div>
+                            <div class="card-body" id="contenedorCategoria"></div>
+
                         </div>
                     </div>
                 </div>
+
                 <div class="row mb-4">
                     <div class="col-sm-12">
                         <div class="card">
+
                             <div class="card-header bg-dark text-white">
                                 Marcas
                             </div>
-                            <div class="card-body" id="contenedorMarca">
-                            </div>
+
+                            <div class="card-body" id="contenedorMarca"></div>
+
                         </div>
                     </div>
                 </div>
+
                 <div class="row mb-4">
                     <div class="col-sm-12">
+
                         <div class="d-grid gap-2">
-                            <button class="btn btn-outline-dark btn-block" id="aplicarFiltro">
+                            <button class="btn btn-outline-dark" id="aplicarFiltro">
                                 <i class="fas fa-filter"></i> Filtrar
                             </button>
                         </div>
+
                     </div>
                 </div>
 
             </div>
-            <div class="col-sm-9">
-                <div id="contenedorProducto" class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-                    <div class="col mb-5">
-                        <div class="card h-100">
-                            <!-- Product image-->
-                            <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="..." />
-                            <!-- Product details-->
-                            <div class="card-body p-4">
-                                <div class="text-center">
-                                    <!-- Product name-->
-                                    <h5 class="fw-bolder">Fancy Product</h5>
-                                    <!-- Product price-->
-                                    $40.00 - $80.00
-                                </div>
-                            </div>
-                            <!-- Product actions-->
-                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">View options</a></div>
-                            </div>
+
+
+            <!-- PRODUCTOS -->
+            <div class="col-sm-9" id="productosApp">
+
+                <!-- BUSCADOR Y ORDEN -->
+                <div class="row g-2 mb-3 align-items-center">
+
+                    <div class="col-md-6">
+
+                        <div class="position-relative">
+
+                            <i class="bi bi-search
+                                position-absolute
+                                top-50
+                                start-0
+                                translate-middle-y
+                                ms-3
+                                text-secondary"></i>
+
+                            <input class="search form-control ps-5 rounded-pill shadow-sm"
+                                   type="search"
+                                   placeholder="Buscar producto...">
+
                         </div>
+
                     </div>
-                    <div class="col mb-5">
-                        <div class="card h-100">
-                            <!-- Sale badge-->
-                            <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sale</div>
-                            <!-- Product image-->
-                            <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="..." />
-                            <!-- Product details-->
-                            <div class="card-body p-4">
-                                <div class="text-center">
-                                    <!-- Product name-->
-                                    <h5 class="fw-bolder">Special Item</h5>
-                                    <!-- Product reviews-->
-                                    <div class="d-flex justify-content-center small text-warning mb-2">
-                                        <div class="bi-star-fill"></div>
-                                        <div class="bi-star-fill"></div>
-                                        <div class="bi-star-fill"></div>
-                                        <div class="bi-star-fill"></div>
-                                        <div class="bi-star-fill"></div>
-                                    </div>
-                                    <!-- Product price-->
-                                    <span class="text-muted text-decoration-line-through">$20.00</span>
-                                    $18.00
-                                </div>
-                            </div>
-                            <!-- Product actions-->
-                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="#">Add to cart</a></div>
-                            </div>
-                        </div>
+
+                    <div class="col-md-3">
+                        <button class="sort btn btn-outline-dark w-100 rounded-pill shadow-sm"
+                                data-sort="nombre">
+
+                            <i class="bi bi-sort-alpha-down"></i>
+                            Ordenar nombre
+                            <span class="icono-orden ms-1"></span>
+
+                        </button>
                     </div>
+
+                    <div class="col-md-3">
+                        <button class="sort btn btn-outline-success w-100 rounded-pill shadow-sm"
+                                data-sort="precio">
+
+                            <i class="bi bi-cash-coin"></i>
+                            Ordenar precio
+                            <span class="icono-orden ms-1"></span>
+
+                        </button>
+                    </div>
+
                 </div>
+
+                <hr>
+
+                <!-- PRODUCTOS -->
+                <div id="contenedorProducto"
+                     class="row list gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+                </div>
+
+                <!-- PAGINACION -->
+                <ul class="pagination justify-content-center mt-4"></ul>
+
             </div>
+
         </div>
     </div>
 </section>
+@section scripts {
 
-@section scripts{
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+
     <script>
-           $(document).ready(function () {
+
+        let listaProductos = null;
+
+        $(document).ready(function () {
 
             cargarCategorias();
-            cargarProductos(0, 0);
+            cargarProductos(0,0);
 
-            // Botón filtrar
             $("#aplicarFiltro").click(function () {
 
                 let idCategoria = $("input[name='categoria']:checked").val() || 0;
                 let idMarca = $("input[name='marca']:checked").val() || 0;
 
-                cargarProductos(idCategoria, idMarca);
+                cargarProductos(idCategoria,idMarca);
+
             });
 
         });
@@ -127,213 +156,367 @@
         var usuarioAutenticado = @(User.Identity != null && User.Identity.IsAuthenticated ? "true" : "false");
 
 
-        // ================= CATEGORIAS =================
-        function cargarCategorias() {
+        /* =========================
+        ICONOS ORDEN
+        ========================= */
 
-            $.ajax({
-                url: '@Url.Action("ListaCategorias", "Tienda")',
-                type: "GET",
+        document.addEventListener("click",function(e){
 
-                beforeSend: function () {
-                    $("#contenedorCategoria").LoadingOverlay("Show", {
-                        text: "Cargando categorías..."
-                    });
-                },
+        if(e.target.closest(".sort")){
 
-                complete: function () {
-                    $("#contenedorCategoria").LoadingOverlay("Hide");
-                },
+        let btn = e.target.closest(".sort");
+        let icono = btn.querySelector(".icono-orden");
 
-                success: function (response) {
+        document.querySelectorAll(".icono-orden").forEach(i=>{
+        if(i !== icono) i.innerHTML="";
+        });
 
-                    $("#contenedorCategoria").empty();
-                    // opción todos
-                    $("#contenedorCategoria").append(`
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="categoria" value="0" checked>
-                            <label class="form-check-label">Todas</label>
-                        </div>
-                    `);
-
-                    $.each(response.data, function (i, item) {
-
-                        $("#contenedorCategoria").append(`
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="categoria" value="${item.id}">
-                                <label class="form-check-label">${item.descripcion}</label>
-                            </div>
-                        `);
-
-                    });
-
-                    // Evento cuando cambia categoría
-                    $("input[name='categoria']").change(function () {
-
-                        let idCategoria = $(this).val();
-                        cargarMarcas(idCategoria);
-                    });
-
-                }
-            });
+        if(icono.innerHTML === "↑"){
+        icono.innerHTML = "↓";
+        }else{
+        icono.innerHTML = "↑";
         }
-
-
-        // ================= MARCAS =================
-        function cargarMarcas(idCategoria) {
-
-            $.ajax({
-                url: '@Url.Action("ListarMarcaPorCategoria", "Tienda")',
-                type: "POST",
-                data: { idCategoria: idCategoria },
-
-                beforeSend: function () {
-                    $("#contenedorMarca").LoadingOverlay("Show", {
-                        text: "Cargando marcas..."
-                    });
-                },
-
-                complete: function () {
-                    $("#contenedorMarca").LoadingOverlay("Hide");
-                },
-
-                success: function (response) {
-
-                    $("#contenedorMarca").empty();
-
-                    $("#contenedorMarca").append(`
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="marca" value="0" checked>
-                            <label class="form-check-label">Todas</label>
-                        </div>
-                    `);
-
-                    $.each(response.data, function (i, item) {
-
-                        $("#contenedorMarca").append(`
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="marca" value="${item.id}">
-                                <label class="form-check-label">${item.descripcion}</label>
-                            </div>
-                        `);
-
-                    });
-
-                }
-            });
-        }
-
-
-        // ================= PRODUCTOS =================
-        function cargarProductos(idCategoria, idMarca) {
-
-            $.ajax({
-                url: '@Url.Action("ListarProducto", "Tienda")',
-                type: "POST",
-                data: {
-                    idCategoria: idCategoria,
-                    idMarca: idMarca
-                },
-
-                beforeSend: function () {
-                    $("#contenedorProducto")
-                        .css("min-height", "80%")
-                        .LoadingOverlay("Show", {
-                            text: "Cargando productos..."
-                        });
-                },
-
-                complete: function () {
-                    $("#contenedorProducto").LoadingOverlay("Hide");
-                },
-
-                success: function (response) {
-
-                    $("#contenedorProducto").empty();
-
-                    if (response.data.length > 0) {
-                    $.each(response.data, function (i, item) {
-
-                        let imagen = item.base64 != ""
-                            ? "data:" + item.extension.replace(".", "") + ";base64," + item.base64
-                            : "https://dummyimage.com/450x300/dee2e6/6c757d.jpg";
-
-                        $("#contenedorProducto").append(`
-                            <div class="col mb-5">
-                                <div class="card h-100">
-                                    <img class="card-img-top" src="${imagen}" />
-                                    <div class="card-body p-4">
-                                        <div class="text-center">
-                                            <h5 class="fw-bolder">${item.nombre}</h5>
-                                            $${item.precio}
-                                        </div>
-                                    </div>
-                                    <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                        <div class="d-grid gap-2">
-                                            <a href="@Url.Action("DetalleProducto","Tienda")?id=${item.id}" class="btn btn-outline-success">
-                                                Ver detalle
-                                            </a>
-                                            ${usuarioAutenticado
-                                                        ? `<button class="btn btn-outline-dark"
-                                                            onclick="agregarCarrito(${item.id},1)">
-                                                            Agregar al carrito
-                                                        </button>`
-                                                : ""
-                                            }
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        `);
-
-                    });
-                    }else{
-                             $("#contenedorProducto").html(`
-                             <div class="col-12 d-flex justify-content-center align-items-center" style="min-height: 400px;">
-                                <h5>No se encontraron productos</h5>
-                             </div>
-                            `);
-                    }
-                }
-            });
 
         }
 
-        function agregarCarrito(idProducto, cantidad){
+        });
 
-            $.ajax({
-                url: '@Url.Action("AgregarCarrito", "Tienda")',
-                type: "POST",
-                data: {
-                    idProducto: idProducto,
-                    cantidad: cantidad
-                },
-                success: function(response){
 
-                    if(response.respuesta){
+        /* =========================
+        CATEGORIAS
+        ========================= */
 
-                        actualizarContador(response.cantidad);
+        function cargarCategorias(){
 
-                        mostrarToast(
-                            'success',
-                            response.mensaje || 'Producto agregado correctamente'
-                        );
+        $.ajax({
 
-                    }else{
+        url:'@Url.Action("ListaCategorias", "Tienda")',
+        type:"GET",
 
-                        mostrarToast(
-                            'error',
-                            response.mensaje || 'Ocurrió un error'
-                        );
+        beforeSend:function(){
 
-                    }
-                },
-                error: function(){
-                    mostrarToast(
-                        'error',
-                        'Error inesperado en el servidor'
-                    );
-                }
-            });
+        $("#contenedorCategoria").LoadingOverlay("Show",{
+        text:"Cargando categorías..."
+        });
+
+        },
+
+        complete:function(){
+
+        $("#contenedorCategoria").LoadingOverlay("Hide");
+
+        },
+
+        success:function(response){
+
+        $("#contenedorCategoria").empty();
+
+        $("#contenedorCategoria").append(`
+        <div class="form-check">
+        <input class="form-check-input" type="radio" name="categoria" value="0" checked>
+        <label class="form-check-label">Todas</label>
+        </div>
+        `);
+
+        $.each(response.data,function(i,item){
+
+        $("#contenedorCategoria").append(`
+        <div class="form-check">
+        <input class="form-check-input" type="radio" name="categoria" value="${item.id}">
+        <label class="form-check-label">${item.descripcion}</label>
+        </div>
+        `);
+
+        });
+
+        $("input[name='categoria']").change(function(){
+
+        let idCategoria=$(this).val();
+        cargarMarcas(idCategoria);
+
+        });
+
         }
+
+        });
+
+        }
+
+
+        /* =========================
+        MARCAS
+        ========================= */
+
+        function cargarMarcas(idCategoria){
+
+        $.ajax({
+
+        url:'@Url.Action("ListarMarcaPorCategoria", "Tienda")',
+        type:"POST",
+        data:{idCategoria:idCategoria},
+
+        beforeSend:function(){
+
+        $("#contenedorMarca").LoadingOverlay("Show",{
+        text:"Cargando marcas..."
+        });
+
+        },
+
+        complete:function(){
+
+        $("#contenedorMarca").LoadingOverlay("Hide");
+
+        },
+
+        success:function(response){
+
+        $("#contenedorMarca").empty();
+
+        $("#contenedorMarca").append(`
+        <div class="form-check">
+        <input class="form-check-input" type="radio" name="marca" value="0" checked>
+        <label class="form-check-label">Todas</label>
+        </div>
+        `);
+
+        $.each(response.data,function(i,item){
+
+        $("#contenedorMarca").append(`
+        <div class="form-check">
+        <input class="form-check-input" type="radio" name="marca" value="${item.id}">
+        <label class="form-check-label">${item.descripcion}</label>
+        </div>
+        `);
+
+        });
+
+        }
+
+        });
+
+        }
+
+
+        /* =========================
+        PRODUCTOS
+        ========================= */
+
+        function cargarProductos(idCategoria,idMarca){
+
+        $.ajax({
+
+        url:'@Url.Action("ListarProducto", "Tienda")',
+        type:"POST",
+
+        data:{
+        idCategoria:idCategoria,
+        idMarca:idMarca
+        },
+
+        beforeSend:function(){
+
+        $("#contenedorProducto")
+        .css("min-height","300px")
+        .LoadingOverlay("Show",{text:"Cargando productos..."});
+
+        },
+
+        complete:function(){
+
+        $("#contenedorProducto").LoadingOverlay("Hide");
+
+        },
+
+        success:function(response){
+
+        $("#contenedorProducto").empty();
+
+
+        /* DESTRUIR LISTA ANTERIOR */
+
+        if(listaProductos != null){
+
+        listaProductos.clear();
+        listaProductos = null;
+
+        }
+
+
+        /* SI HAY PRODUCTOS */
+
+        if(response.data.length > 0){
+
+        $.each(response.data,function(i,item){
+
+        let imagen = item.base64 != ""
+        ? "data:" + item.extension.replace(".", "") + ";base64," + item.base64
+        : "https://dummyimage.com/450x300/dee2e6/6c757d.jpg";
+
+
+        $("#contenedorProducto").append(`
+
+        <div class="col mb-5">
+
+        <div class="card h-100">
+
+        <img class="card-img-top" src="${imagen}" />
+
+        <div class="card-body p-4">
+
+        <div class="text-center">
+
+        <h5 class="fw-bolder nombre">
+        ${item.nombre}
+        </h5>
+
+        <p class="precio text-success fw-bold">
+        $${item.precio}
+        </p>
+
+        </div>
+
+        </div>
+
+        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+
+        <div class="d-grid gap-2">
+
+        <a href="@Url.Action("DetalleProducto", "Tienda")?id=${item.id}"
+        class="btn btn-outline-success">
+
+        Ver detalle
+
+        </a>
+
+        ${usuarioAutenticado
+        ? `<button class="btn btn-outline-dark"
+        onclick="agregarCarrito(${item.id},1)">
+        Agregar al carrito
+        </button>`
+        : ""
+        }
+
+        </div>
+
+        </div>
+
+        </div>
+
+        </div>
+
+        `);
+
+        });
+
+
+        /* CREAR LISTA */
+
+        listaProductos = new List('productosApp',{
+
+        valueNames:['nombre','precio'],
+        page:8,
+        pagination:true
+
+        });
+
+        }else{
+
+        $("#contenedorProducto").html(`
+        <div class="col-12 text-center p-5">
+        <h5>No se encontraron productos</h5>
+        </div>
+        `);
+
+        }
+
+        }
+
+        });
+
+        }
+
+
+        /* =========================
+        CARRITO
+        ========================= */
+
+        function agregarCarrito(idProducto,cantidad){
+
+        $.ajax({
+
+        url:'@Url.Action("AgregarCarrito", "Tienda")',
+        type:"POST",
+
+        data:{
+        idProducto:idProducto,
+        cantidad:cantidad
+        },
+
+        success:function(response){
+
+        if(response.respuesta){
+
+        actualizarContador(response.cantidad);
+
+        mostrarToast(
+        'success',
+        response.mensaje || 'Producto agregado correctamente'
+        );
+
+        }else{
+
+        mostrarToast(
+        'error',
+        response.mensaje || 'Ocurrió un error'
+        );
+
+        }
+
+        },
+
+        error:function(){
+
+        mostrarToast(
+        'error',
+        'Error inesperado en el servidor'
+        );
+
+        }
+
+        });
+
+        }
+
     </script>
 }
+
+<style>
+
+    .pagination li {
+        list-style: none;
+        margin: 0 4px;
+    }
+
+        .pagination li a {
+            display: inline-block;
+            padding: 6px 14px;
+            border: 1px solid #212529;
+            color: #212529;
+            text-decoration: none;
+            border-radius: 999px;
+            transition: all .2s ease;
+        }
+
+            .pagination li a:hover {
+                background: #212529;
+                color: white;
+            }
+
+        .pagination li.active a {
+            background: #212529;
+            color: white;
+            border-color: #212529;
+        }
+
+</style>
